@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Шаблоны маршрутов — Targem Games{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1">Шаблоны маршрутов</h1>
+        <p class="text-muted mb-0 small">Конструктор адаптационных маршрутов</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'routes:assign' %}" class="btn btn-outline-primary">
+            <i class="bi bi-person-plus me-1"></i>Назначить маршрут
+        </a>
+        <a href="{% url 'routes:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Новый шаблон
+        </a>
+    </div>
+</div>
+
+{% if templates %}
+    <div class="row g-3">
+        {% for tmpl in templates %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-500 mb-2">{{ tmpl.name }}</h5>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% if tmpl.target_role %}
+                            <span class="badge category-badge">{{ tmpl.get_target_role_display }}</span>
+                        {% endif %}
+                        {% if tmpl.department %}
+                            <span class="badge bg-light text-muted border">{{ tmpl.department }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="bi bi-layers me-1"></i>{{ tmpl.stage_count }} этапов
+                        &nbsp;·&nbsp;
+                        <i class="bi bi-check2-square me-1"></i>{{ tmpl.task_count }} заданий
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4 d-flex gap-2">
+                    <a href="{% url 'routes:edit' pk=tmpl.pk %}" class="btn btn-sm btn-outline-primary flex-grow-1">
+                        <i class="bi bi-pencil me-1"></i>Редактировать
+                    </a>
+                    <form method="post" action="{% url 'routes:delete' pk=tmpl.pk %}" class="mb-0"
+                          onsubmit="return confirm('Удалить шаблон «{{ tmpl.name }}»?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-map fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">Шаблонов маршрутов пока нет.</p>
+        <a href="{% url 'routes:create' %}" class="btn btn-primary">Создать первый шаблон</a>
+    </div>
+{% endif %}
+{% endblock %}

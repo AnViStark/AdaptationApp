@@ -1,0 +1,4 @@
+*.env
+.venv/
+ТЗ_система_адаптации_Targem.md
+__pycache__/

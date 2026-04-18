@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Назначить маршрут — Targem Games{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'routes:list' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-map me-1"></i>Маршруты
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Назначить маршрут</li>
+    </ol>
+</nav>
+<h1 class="h3 mb-4">Назначить маршрут сотруднику</h1>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-500">
+                                {{ field.label }}
+                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Назначить
+                        </button>
+                        <a href="{% url 'routes:list' %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 offset-lg-1">
+        <div class="card shadow-sm" style="border-left: 3px solid var(--targem-primary);">
+            <div class="card-body p-3">
+                <h6 class="fw-500 mb-2"><i class="bi bi-info-circle text-primary me-1"></i>Как это работает</h6>
+                <ul class="small text-muted mb-0 ps-3">
+                    <li class="mb-1">Выберите сотрудника без активного маршрута</li>
+                    <li class="mb-1">Укажите шаблон — список этапов и заданий будет создан автоматически</li>
+                    <li class="mb-1">Назначьте наставника (необязательно)</li>
+                    <li>Сотрудник сразу увидит маршрут на странице /adaptation/</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

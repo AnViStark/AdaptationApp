@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} — Тренажёр{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'trainer:list' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-bug me-1"></i>Тренажёр
+            </a>
+        </li>
+        <li class="breadcrumb-item active">{{ task.title }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Scenario -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white px-4 py-3 border-bottom">
+                <h5 class="mb-0 fw-500">
+                    <i class="bi bi-file-text me-2" style="color: #c07d00;"></i>Сценарий
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-0" style="line-height: 1.75; white-space: pre-line;">{{ task.scenario_description }}</p>
+            </div>
+        </div>
+
+        <!-- Review result (if exists) -->
+        {% if review %}
+            <div class="card shadow-sm mb-4 {% if review.result == 'accepted' %}border-success{% else %}border-warning{% endif %}"
+                 style="border-width: 0 0 0 4px !important; border-style: solid !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        {% if review.result == 'accepted' %}
+                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                            <h5 class="mb-0 fw-500 text-success">Принято</h5>
+                        {% else %}
+                            <i class="bi bi-exclamation-circle-fill fs-5" style="color: #EF9F27;"></i>
+                            <h5 class="mb-0 fw-500" style="color: #EF9F27;">Требует доработки</h5>
+                        {% endif %}
+                        <span class="text-muted small ms-auto">
+                            Наставник: {{ review.mentor.get_full_name|default:review.mentor.username }}
+                            · {{ review.reviewed_at|date:"d.m.Y" }}
+                        </span>
+                    </div>
+                    <p class="mb-0 text-muted">{{ review.comment }}</p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Previous submission (read-only) -->
+        {% if submission and not can_submit %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white px-4 py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-500">Ваш баг-репорт</h5>
+                    <span class="badge" style="background: #EF9F27;">
+                        <i class="bi bi-hourglass-split me-1"></i>На проверке
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    {% include 'trainer/_submission_readonly.html' with sub=submission %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Bug report form -->
+        {% if can_submit and form %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white px-4 py-3 border-bottom">
+                    <h5 class="mb-0 fw-500">
+                        {% if submission and submission.status == 'revision' %}
+                            <i class="bi bi-pencil-square me-2 text-primary"></i>Исправить баг-репорт
+                        {% else %}
+                            <i class="bi bi-send me-2 text-primary"></i>Отправить баг-репорт
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-4">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-500">
+                                    {{ field.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Отправить на проверку
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Accepted: show the submission read-only -->
+        {% if submission and submission.status == 'accepted' %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-white px-4 py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-500">Ваш баг-репорт</h5>
+                    <span class="badge" style="background: #27AE60;">
+                        <i class="bi bi-check-lg me-1"></i>Принято
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    {% include 'trainer/_submission_readonly.html' with sub=submission %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body p-4">
+                <h6 class="fw-500 mb-3">Информация о задании</h6>
+                <div class="d-flex flex-column gap-2 small">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Баллы за принятие</span>
+                        <strong class="text-primary">{{ task.points_reward }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Статус</span>
+                        <span>
+                            {% if not submission %}Не начато
+                            {% elif submission.status == 'pending' %}На проверке
+                            {% elif submission.status == 'accepted' %}Принято ✓
+                            {% elif submission.status == 'revision' %}Требует доработки
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if submission %}
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Отправлено</span>
+                            <span>{{ submission.submitted_at|date:"d.m.Y" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'trainer:list' %}" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-arrow-left me-1"></i>Назад к списку
+        </a>
+    </div>
+</div>
+{% endblock %}

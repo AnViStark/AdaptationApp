@@ -1,0 +1,22 @@
+<div class="d-flex flex-column gap-3">
+    <div>
+        <div class="text-muted small mb-1 fw-500">Заголовок</div>
+        <div>{{ sub.headline }}</div>
+    </div>
+    <div>
+        <div class="text-muted small mb-1 fw-500">Описание</div>
+        <div style="white-space: pre-line;">{{ sub.description }}</div>
+    </div>
+    <div>
+        <div class="text-muted small mb-1 fw-500">Версия билда</div>
+        <div>{{ sub.build_version }}</div>
+    </div>
+    <div>
+        <div class="text-muted small mb-1 fw-500">Ожидаемый результат</div>
+        <div style="white-space: pre-line;">{{ sub.expected_result }}</div>
+    </div>
+    <div>
+        <div class="text-muted small mb-1 fw-500">Фактический результат</div>
+        <div style="white-space: pre-line;">{{ sub.actual_result }}</div>
+    </div>
+</div>

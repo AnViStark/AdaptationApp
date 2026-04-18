@@ -1,0 +1,8 @@
+django==5.1
+psycopg2-binary==2.9.9
+chromadb==0.5.23
+markdown==3.7
+python-dotenv==1.0.1
+requests==2.32.3
+pillow==10.4.0
+sentence-transformers==3.3.1

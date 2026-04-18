@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — Targem Games{% endblock %}
+
+{% block content %}
+<div class="p-4 p-md-5 mb-4 rounded-3 targem-hero">
+    <div class="container-fluid py-3">
+        <h1 class="display-6 fw-bold mb-3">Добро пожаловать в систему адаптации Targem Games</h1>
+        <p class="col-md-9 fs-5 mb-0">Здесь вы найдёте всё необходимое для успешного старта — маршрут адаптации, базу знаний, тренажёр и помощника Вэйда.</p>
+    </div>
+</div>
+
+{% if user.role == 'employee' %}
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi bi-flag-fill me-2 text-primary"></i>Мой прогресс</h5>
+        {% if route %}
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">{{ route.template.name }}</span>
+                <span class="text-muted small fw-500">{{ route_done }} из {{ route_total }} заданий</span>
+            </div>
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar" style="width: {{ route_percent }}%;" role="progressbar"
+                     aria-valuenow="{{ route_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="mt-2 text-end">
+                <a href="{% url 'adaptation:index' %}" class="small text-decoration-none" style="color: var(--targem-primary);">
+                    Перейти к маршруту <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        {% else %}
+            <p class="text-muted mb-2">Маршрут будет назначен кадровой службой</p>
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    {% if user.role == 'employee' or user.role == 'mentor' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'adaptation:index' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-signpost-split-fill targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Мой маршрут</h5>
+                    <p class="card-text text-muted">Приветственный квест — задания и этапы адаптации</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'knowledge:catalog' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-book-half targem-card-icon"></i>
+                    <h5 class="card-title mt-3">База знаний</h5>
+                    <p class="card-text text-muted">Статьи, регламенты и материалы компании</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% if user.role == 'employee' or user.role == 'mentor' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'assistant:chat' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-robot targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Помощник Вэйд</h5>
+                    <p class="card-text text-muted">Задайте вопрос — Вэйд найдёт ответ в базе знаний</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    {% if user.role == 'employee' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'trainer:list' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-bug-fill targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Тренажёр</h5>
+                    <p class="card-text text-muted">Тренировка баг-репортов по стандарту Targem</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    {% if user.role == 'mentor' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'users:mentees' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Мои подопечные</h5>
+                    <p class="card-text text-muted">Прогресс ваших новичков и задания на проверку</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    {% if user.role == 'hr' or user.role == 'admin' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'monitoring:index' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-speedometer2 targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Мониторинг</h5>
+                    <p class="card-text text-muted">Сводная панель по всем новым сотрудникам</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'routes:list' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-diagram-3-fill targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Шаблоны маршрутов</h5>
+                    <p class="card-text text-muted">Конструктор и назначение маршрутов адаптации</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+    {% if user.role == 'admin' %}
+    <div class="col-md-6 col-lg-3">
+        <a href="{% url 'admin_panel:index' %}" class="text-decoration-none text-reset">
+            <div class="card h-100 shadow-sm targem-card">
+                <div class="card-body text-center">
+                    <i class="bi bi-gear-fill targem-card-icon"></i>
+                    <h5 class="card-title mt-3">Администрирование</h5>
+                    <p class="card-text text-muted">Пользователи, настройки системы и модели Ollama</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Маршрут не назначен — Targem Games{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm text-center" style="max-width: 520px; margin: 4rem auto;">
+    <div class="card-body py-5">
+        <i class="bi bi-signpost-split text-muted" style="font-size: 3.5rem;"></i>
+        <h3 class="mt-4 mb-2">Маршрут ещё не назначен</h3>
+        <p class="text-muted mb-4">Специалист кадровой службы скоро назначит вам маршрут адаптации и наставника. Пока можете изучить базу знаний.</p>
+        <a href="{% url 'knowledge:catalog' %}" class="btn btn-primary">
+            <i class="bi bi-book me-2"></i>Перейти в базу знаний
+        </a>
+    </div>
+</div>
+{% endblock %}

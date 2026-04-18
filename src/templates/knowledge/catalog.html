@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}База знаний — Targem Games{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1">База знаний</h1>
+        <p class="text-muted mb-0">Корпоративные статьи и руководства</p>
+    </div>
+    {% if user.role in 'admin hr' or user.role == 'admin' or user.role == 'hr' %}
+        <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Новая статья
+        </a>
+    {% endif %}
+</div>
+
+<!-- Search -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" name="q" value="{{ query }}"
+                       class="form-control border-start-0 ps-0"
+                       placeholder="Поиск по названию статьи…">
+            </div>
+            <button type="submit" class="btn btn-primary px-4">Найти</button>
+            {% if query %}
+                <a href="{% url 'knowledge:catalog' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if query %}
+    <!-- Search results -->
+    <h5 class="mb-3">
+        Результаты поиска: «{{ query }}»
+        {% if articles %}
+            <span class="badge bg-secondary ms-2">{{ articles|length }}</span>
+        {% endif %}
+    </h5>
+    {% if articles %}
+        <div class="row g-3">
+            {% for article in articles %}
+                <div class="col-12">
+                    <a href="{% url 'knowledge:article' slug=article.slug %}" class="text-decoration-none">
+                        <div class="card shadow-sm article-card">
+                            <div class="card-body d-flex align-items-start gap-3">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge category-badge">{{ article.category.name }}</span>
+                                    </div>
+                                    <h6 class="mb-1 text-dark">{{ article.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>{{ article.updated_at|date:"d.m.Y" }}
+                                    </small>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted align-self-center"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-search fs-1 text-muted opacity-50 d-block mb-3"></i>
+            <p class="text-muted">Статьи с таким названием не найдены.</p>
+        </div>
+    {% endif %}
+
+{% else %}
+    <!-- Category grid -->
+    {% if categories %}
+        <div class="row g-4">
+            {% for category in categories %}
+                <div class="col-md-6 col-lg-4">
+                    <a href="{% url 'knowledge:category' slug=category.slug %}" class="text-decoration-none">
+                        <div class="card shadow-sm targem-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="category-icon-wrap">
+                                        <i class="bi bi-folder2-open"></i>
+                                    </div>
+                                    <h5 class="mb-0 text-dark fw-500">{{ category.name }}</h5>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    {{ category.articles.count }}
+                                    {% with count=category.articles.count %}
+                                        {% if count == 1 %}статья{% elif count >= 2 and count <= 4 %}статьи{% else %}статей{% endif %}
+                                    {% endwith %}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                                <span class="text-primary small fw-500">
+                                    Открыть <i class="bi bi-arrow-right ms-1"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-journal-x fs-1 text-muted opacity-50 d-block mb-3"></i>
+            <p class="text-muted">База знаний пока пуста.</p>
+            {% if user.role == 'admin' or user.role == 'hr' %}
+                <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
+                    Создать первую статью
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

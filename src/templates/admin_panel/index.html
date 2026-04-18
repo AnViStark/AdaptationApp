@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Администрирование — Targem Games{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+    <div class="rounded-3 p-3" style="background: linear-gradient(135deg, #1A2B4A, #2B4573);">
+        <i class="bi bi-shield-lock-fill text-primary fs-4"></i>
+    </div>
+    <div>
+        <h1 class="h3 mb-0">Администрирование</h1>
+        <p class="text-muted mb-0 small">Управление системой Targem Games</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Users -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:users' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(30,207,255,0.1);">
+                            <i class="bi bi-people-fill text-primary"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Пользователи</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Управление учётными записями: создание, изменение ролей, активация/деактивация.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Trainer tasks -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:trainer' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(239,159,39,0.1);">
+                            <i class="bi bi-bug-fill" style="color: #c07d00;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Задания тренажёра</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Создание и редактирование сценариев для практики написания баг-репортов.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Settings -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:settings' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(39,174,96,0.1);">
+                            <i class="bi bi-gear-fill" style="color: #27AE60;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Настройки системы</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Конфигурация моделей Ollama, параметры геймификации и другие системные настройки.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- System info -->
+<div class="card shadow-sm mt-4">
+    <div class="card-body p-4">
+        <h6 class="fw-500 mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Информация о системе</h6>
+        <div class="row g-3">
+            <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <div>
+                        <div class="small fw-500">Django</div>
+                        <div class="text-muted" style="font-size: 0.78rem;">Веб-фреймворк</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <div>
+                        <div class="small fw-500">PostgreSQL</div>
+                        <div class="text-muted" style="font-size: 0.78rem;">База данных</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <div>
+                        <div class="small fw-500">ChromaDB</div>
+                        <div class="text-muted" style="font-size: 0.78rem;">Векторная БД</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} — База знаний{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'knowledge:catalog' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-journals me-1"></i>База знаний
+            </a>
+        </li>
+        <li class="breadcrumb-item active">{{ category.name }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1">{{ category.name }}</h1>
+        <p class="text-muted mb-0">{{ articles|length }} статей в категории</p>
+    </div>
+    {% if user.role == 'admin' or user.role == 'hr' %}
+        <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Новая статья
+        </a>
+    {% endif %}
+</div>
+
+{% if articles %}
+    <div class="card shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for article in articles %}
+                <a href="{% url 'knowledge:article' slug=article.slug %}"
+                   class="list-group-item list-group-item-action px-4 py-3 article-list-item">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="fw-500 text-dark mb-1">{{ article.title }}</div>
+                            <div class="text-muted small">
+                                {% if article.created_by %}
+                                    <i class="bi bi-person me-1"></i>{{ article.created_by.get_full_name|default:article.created_by.username }}
+                                    &nbsp;·&nbsp;
+                                {% endif %}
+                                <i class="bi bi-clock me-1"></i>{{ article.updated_at|date:"d.m.Y" }}
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-journal-x fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">В этой категории пока нет статей.</p>
+        {% if user.role == 'admin' or user.role == 'hr' %}
+            <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
+                Добавить статью
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

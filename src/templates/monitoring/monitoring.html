@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Мониторинг — Targem Games{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1">Мониторинг</h1>
+        <p class="text-muted mb-0 small">Прогресс всех новых сотрудников</p>
+    </div>
+    <a href="{% url 'routes:assign' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-person-plus me-1"></i>Назначить маршрут
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+            <select name="department" class="form-select form-select-sm" style="max-width: 220px;">
+                <option value="">Все отделы</option>
+                {% for dep in departments %}
+                    <option value="{{ dep }}" {% if dep == department_filter %}selected{% endif %}>{{ dep }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-funnel me-1"></i>Фильтр
+            </button>
+            {% if department_filter %}
+                <a href="{% url 'monitoring:index' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-lg me-1"></i>Сбросить
+                </a>
+            {% endif %}
+            <span class="text-muted small ms-2">
+                Показано: <strong>{{ rows|length }}</strong> сотрудников
+            </span>
+        </form>
+    </div>
+</div>
+
+{% if rows %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="px-4 py-3">Сотрудник</th>
+                    <th>Отдел</th>
+                    <th>Наставник</th>
+                    <th>Прогресс</th>
+                    <th>Дней</th>
+                    <th>Посл. активность</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr class="align-middle" style="cursor:pointer;"
+                    onclick="location.href='{% url 'monitoring:employee_detail' user_id=row.user.pk %}'">
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="mentee-avatar" style="width:34px;height:34px;font-size:0.75rem;">
+                                {{ row.user.first_name|first|upper }}{{ row.user.last_name|first|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-500 small">{{ row.user.get_full_name|default:row.user.username }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">{{ row.user.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-muted small">{{ row.user.department|default:"—" }}</td>
+                    <td class="small">
+                        {% if row.mentor %}
+                            {{ row.mentor.get_full_name|default:row.mentor.username }}
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="min-width: 140px;">
+                        {% if row.route %}
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:6px;">
+                                    <div class="progress-bar" style="width:{{ row.progress }}%;"></div>
+                                </div>
+                                <span class="small fw-500 text-primary" style="min-width:32px;">{{ row.progress }}%</span>
+                            </div>
+                        {% else %}
+                            <span class="badge bg-secondary" style="font-size:0.72rem;">Нет маршрута</span>
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">
+                        {% if row.days_in_system != None %}{{ row.days_in_system }}д{% else %}—{% endif %}
+                    </td>
+                    <td class="small text-muted">
+                        {% if row.last_activity %}{{ row.last_activity|date:"d.m.Y" }}{% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-people fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">Сотрудников не найдено.</p>
+    </div>
+{% endif %}
+{% endblock %}

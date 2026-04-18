@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Задания тренажёра — Администрирование{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:index' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-shield-lock me-1"></i>Администрирование
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Задания тренажёра</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0">Задания тренажёра</h1>
+    <a href="{% url 'admin_panel:trainer_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Новое задание
+    </a>
+</div>
+
+{% if tasks %}
+    <div class="card shadow-sm">
+        <div class="list-group list-group-flush">
+            {% for task in tasks %}
+            <div class="list-group-item px-4 py-3">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="flex-grow-1 me-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="fw-500">{{ task.title }}</span>
+                            {% if not task.is_active %}
+                                <span class="badge bg-secondary" style="font-size:0.7rem;">Неактивно</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small">
+                            {{ task.scenario_description|truncatechars:120 }}
+                        </div>
+                        <div class="text-muted small mt-1">
+                            <i class="bi bi-star me-1 text-primary"></i>{{ task.points_reward }} баллов за принятие
+                        </div>
+                    </div>
+                    <div class="d-flex gap-1 flex-shrink-0">
+                        <a href="{% url 'admin_panel:trainer_edit' pk=task.pk %}"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="post" action="{% url 'admin_panel:trainer_delete' pk=task.pk %}"
+                              onsubmit="return confirm('Удалить задание «{{ task.title }}»?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-bug fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">Заданий пока нет.</p>
+        <a href="{% url 'admin_panel:trainer_create' %}" class="btn btn-primary">Создать первое задание</a>
+    </div>
+{% endif %}
+{% endblock %}

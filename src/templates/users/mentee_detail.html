@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.get_full_name|default:employee.username }} — Подопечный{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'users:mentees' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-people me-1"></i>Мои подопечные
+            </a>
+        </li>
+        <li class="breadcrumb-item active">{{ employee.get_full_name|default:employee.username }}</li>
+    </ol>
+</nav>
+
+<!-- Header -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <div class="row align-items-center g-3">
+            <div class="col-auto">
+                <div class="mentee-avatar-lg">
+                    {{ employee.first_name|first|upper }}{{ employee.last_name|first|upper }}
+                </div>
+            </div>
+            <div class="col">
+                <h2 class="h4 mb-1">{{ employee.get_full_name|default:employee.username }}</h2>
+                <div class="text-muted small d-flex flex-wrap gap-3">
+                    {% if employee.department %}
+                        <span><i class="bi bi-building me-1"></i>{{ employee.department }}</span>
+                    {% endif %}
+                    {% if employee.start_date %}
+                        <span><i class="bi bi-calendar3 me-1"></i>С {{ employee.start_date|date:"d.m.Y" }}</span>
+                    {% endif %}
+                    <span><i class="bi bi-envelope me-1"></i>{{ employee.email }}</span>
+                </div>
+            </div>
+            <div class="col-auto text-end">
+                <div class="fw-bold fs-4 text-primary">{{ route.progress_percent }}%</div>
+                <div class="text-muted small">{{ route.completed_tasks }} / {{ route.total_tasks }} заданий</div>
+                <div class="progress mt-1" style="width: 120px; height: 6px;">
+                    <div class="progress-bar" style="width: {{ route.progress_percent }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Route progress (left) -->
+    <div class="col-lg-7">
+        <h5 class="fw-500 mb-3">
+            <i class="bi bi-map me-2 text-primary"></i>Маршрут: {{ route.template.name }}
+        </h5>
+
+        {% for item in stages_data %}
+            {% with stage=item.stage %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white px-4 py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <div class="fw-500">{{ stage.title }}</div>
+                    <span class="text-muted small">{{ item.done }}/{{ item.total }}</span>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for t in item.tasks %}
+                        <div class="list-group-item px-4 py-2 d-flex align-items-center gap-3">
+                            {% if t.completed %}
+                                <i class="bi bi-check-circle-fill text-success flex-shrink-0"></i>
+                            {% else %}
+                                <i class="bi bi-circle text-muted flex-shrink-0"></i>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <span class="{% if t.completed %}text-muted text-decoration-line-through{% endif %}">
+                                    {{ t.task.title }}
+                                </span>
+                            </div>
+                            {% if t.completed_at %}
+                                <span class="text-muted small flex-shrink-0">{{ t.completed_at|date:"d.m" }}</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    <!-- Trainer submissions (right) -->
+    <div class="col-lg-5">
+        <!-- Pending -->
+        <h5 class="fw-500 mb-3">
+            <i class="bi bi-hourglass-split me-2" style="color:#EF9F27;"></i>На проверке
+            {% if pending_submissions %}
+                <span class="badge ms-1" style="background:#EF9F27;">{{ pending_submissions|length }}</span>
+            {% endif %}
+        </h5>
+
+        {% if pending_submissions %}
+            <div class="d-flex flex-column gap-2 mb-4">
+                {% for sub in pending_submissions %}
+                    <a href="{% url 'trainer:review' submission_id=sub.pk %}" class="text-decoration-none">
+                        <div class="card shadow-sm submission-card">
+                            <div class="card-body px-4 py-3">
+                                <div class="fw-500 text-dark small mb-1">{{ sub.task.title }}</div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-muted" style="font-size:0.78rem;">
+                                        {{ sub.submitted_at|date:"d.m.Y H:i" }}
+                                    </span>
+                                    <span class="text-primary small fw-500">
+                                        Проверить <i class="bi bi-arrow-right ms-1"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-muted small mb-4 py-3 text-center border rounded-2">
+                Нет заданий на проверке
+            </div>
+        {% endif %}
+
+        <!-- Reviewed -->
+        <h5 class="fw-500 mb-3">
+            <i class="bi bi-clipboard-check me-2 text-muted"></i>Проверенные
+        </h5>
+        {% if reviewed_submissions %}
+            <div class="d-flex flex-column gap-2">
+                {% for sub in reviewed_submissions %}
+                    <a href="{% url 'trainer:review' submission_id=sub.pk %}" class="text-decoration-none">
+                        <div class="card shadow-sm submission-card">
+                            <div class="card-body px-4 py-3">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="fw-500 text-dark small">{{ sub.task.title }}</div>
+                                    {% if sub.status == 'accepted' %}
+                                        <span class="badge" style="background:#27AE60; font-size:0.7rem;">Принято</span>
+                                    {% else %}
+                                        <span class="badge" style="background:#E24B4A; font-size:0.7rem;">Доработка</span>
+                                    {% endif %}
+                                </div>
+                                <span class="text-muted" style="font-size:0.78rem;">
+                                    {{ sub.submitted_at|date:"d.m.Y" }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-muted small py-3 text-center border rounded-2">
+                Нет проверенных заданий
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

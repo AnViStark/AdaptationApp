@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои подопечные — Targem Games{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-4">
+    <div class="rounded-3 p-3" style="background: rgba(30,207,255,0.1);">
+        <i class="bi bi-people-fill fs-4 text-primary"></i>
+    </div>
+    <div>
+        <h1 class="h3 mb-0">Мои подопечные</h1>
+        <p class="text-muted mb-0 small">
+            {{ mentees_data|length }}
+            {% with c=mentees_data|length %}
+                {% if c == 1 %}сотрудник{% elif c >= 2 and c <= 4 %}сотрудника{% else %}сотрудников{% endif %}
+            {% endwith %}
+            на адаптации
+        </p>
+    </div>
+</div>
+
+{% if mentees_data %}
+    <div class="row g-3">
+        {% for item in mentees_data %}
+            {% with u=item.user r=item.route %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="{% url 'users:mentee_detail' user_id=u.pk %}" class="text-decoration-none">
+                    <div class="card shadow-sm targem-card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="mentee-avatar">
+                                    {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-500 text-dark">{{ u.get_full_name|default:u.username }}</div>
+                                    <div class="text-muted small">{{ u.department|default:"Отдел не указан" }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Progress bar -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-muted">Прогресс</span>
+                                    <span class="fw-500 text-primary">{{ item.percent }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" style="width: {{ item.percent }}%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="text-muted small">
+                                {{ item.done }} из {{ item.total }} заданий
+                                {% if r.started_at %}
+                                    · с {{ r.started_at|date:"d.m.Y" }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                            <span class="text-primary small fw-500">
+                                Детали <i class="bi bi-arrow-right ms-1"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-people fs-1 text-muted opacity-50 d-block mb-3"></i>
+        <p class="text-muted">У вас пока нет подопечных.</p>
+        <p class="text-muted small">Специалист кадровой службы назначит вас наставником при создании маршрута.</p>
+    </div>
+{% endif %}
+{% endblock %}

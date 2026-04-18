@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} — База знаний{% endblock %}
+
+{% block extra_head %}
+<style>
+.article-content h1, .article-content h2, .article-content h3,
+.article-content h4, .article-content h5 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    color: var(--targem-navbar);
+}
+.article-content h1 { font-size: 1.5rem; }
+.article-content h2 { font-size: 1.25rem; border-bottom: 1px solid #e9ecef; padding-bottom: 0.4rem; }
+.article-content h3 { font-size: 1.1rem; }
+.article-content p { line-height: 1.75; margin-bottom: 1rem; }
+.article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+.article-content li { margin-bottom: 0.35rem; line-height: 1.6; }
+.article-content code {
+    background: #f1f3f5;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #d63384;
+}
+.article-content pre {
+    background: #1e2030;
+    color: #cdd6f4;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+.article-content pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+.article-content blockquote {
+    border-left: 4px solid var(--targem-primary);
+    padding: 0.5rem 1rem;
+    background: rgba(30, 207, 255, 0.06);
+    border-radius: 0 0.4rem 0.4rem 0;
+    margin-bottom: 1rem;
+    color: var(--targem-text);
+}
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+.article-content th, .article-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+.article-content th { background-color: #f8f9fa; font-weight: 500; }
+.article-content img { max-width: 100%; border-radius: 0.5rem; }
+.article-content a { color: var(--targem-primary); }
+.article-content hr { border-color: #dee2e6; margin: 1.5rem 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'knowledge:catalog' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-journals me-1"></i>База знаний
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'knowledge:category' slug=article.category.slug %}" class="text-primary text-decoration-none">
+                {{ article.category.name }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active">{{ article.title }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 p-lg-5">
+                <div class="d-flex align-items-start justify-content-between mb-2">
+                    <h1 class="h3 mb-0">{{ article.title }}</h1>
+                    {% if can_edit %}
+                        <a href="{% url 'knowledge:edit' slug=article.slug %}"
+                           class="btn btn-sm btn-outline-secondary ms-3 flex-shrink-0">
+                            <i class="bi bi-pencil me-1"></i>Редактировать
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="text-muted small mb-4 pb-3 border-bottom">
+                    <span class="badge category-badge me-2">{{ article.category.name }}</span>
+                    {% if article.created_by %}
+                        <i class="bi bi-person me-1"></i>{{ article.created_by.get_full_name|default:article.created_by.username }}
+                        &nbsp;·&nbsp;
+                    {% endif %}
+                    <i class="bi bi-clock me-1"></i>Обновлено {{ article.updated_at|date:"d.m.Y" }}
+                </div>
+
+                <div class="article-content">
+                    {{ content_html }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mt-4 mt-lg-0">
+        <!-- Article meta -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h6 class="card-title mb-3 fw-500">О статье</h6>
+                <div class="d-flex flex-column gap-2 small">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Категория</span>
+                        <a href="{% url 'knowledge:category' slug=article.category.slug %}"
+                           class="text-primary text-decoration-none fw-500">
+                            {{ article.category.name }}
+                        </a>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Создана</span>
+                        <span>{{ article.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Обновлена</span>
+                        <span>{{ article.updated_at|date:"d.m.Y" }}</span>
+                    </div>
+                    {% if article.created_by %}
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Автор</span>
+                            <span>{{ article.created_by.get_full_name|default:article.created_by.username }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Back button -->
+        <a href="{% url 'knowledge:category' slug=article.category.slug %}"
+           class="btn btn-outline-secondary w-100">
+            <i class="bi bi-arrow-left me-1"></i>Назад к категории
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,12 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}{{ tmpl.name }} — Редактор маршрута{% endblock %}
+
 {% block extra_head %}
 <style>
 .stage-card { border-left: 3px solid var(--targem-primary); }
 .task-row { border-bottom: 1px solid #f1f3f5; }
 .task-row:last-child { border-bottom: none; }
+.stage-title-input {
+    border: none; background: transparent; box-shadow: none;
+    font-weight: 500; font-size: 0.9rem; padding: 0; width: auto; min-width: 150px;
+}
+.stage-title-input:focus {
+    outline: none; border-bottom: 1px dashed var(--targem-primary);
+    background: transparent; box-shadow: none;
+}
 </style>
 {% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
@@ -15,174 +25,81 @@
                 <i class="bi bi-map me-1"></i>Маршруты
             </a>
         </li>
-        <li class="breadcrumb-item active">{{ tmpl.name }}</li>
+        <li class="breadcrumb-item active" id="breadcrumb-name">{{ tmpl.name }}</li>
     </ol>
 </nav>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0">Редактор: {{ tmpl.name }}</h1>
-    <a href="{% url 'routes:assign' %}" class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-person-plus me-1"></i>Назначить маршрут
-    </a>
+    <h1 class="h3 mb-0">Редактор: <span id="header-name">{{ tmpl.name }}</span></h1>
+    <div class="d-flex gap-2 align-items-center">
+        <span id="unsaved-badge" class="badge bg-warning text-dark d-none">
+            <i class="bi bi-exclamation-triangle me-1"></i>Несохранённые изменения
+        </span>
+        <a href="{% url 'routes:assign' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-person-plus me-1"></i>Назначить маршрут
+        </a>
+        <button id="save-btn" class="btn btn-success" onclick="saveAll()">
+            <i class="bi bi-save me-1"></i>Сохранить изменения
+        </button>
+    </div>
 </div>
 
 <div class="row g-4">
-    <!-- Left: stages -->
+    <!-- Left: stages (JS-rendered) -->
     <div class="col-lg-8">
-        {% if stages %}
-            {% for stage in stages %}
-            <div class="card shadow-sm mb-3 stage-card">
-                <div class="card-header bg-white px-4 py-3 d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-secondary" style="font-size:0.7rem;">{{ stage.order }}</span>
-                        <span class="fw-500">{{ stage.title }}</span>
-                        <span class="text-muted small">({{ stage.tasks.count }} заданий)</span>
-                    </div>
-                    <div class="d-flex gap-1">
-                        <form method="post" action="{% url 'routes:stage_move' pk=stage.pk direction='up' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Вверх">
-                                <i class="bi bi-arrow-up"></i>
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'routes:stage_move' pk=stage.pk direction='down' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="Вниз">
-                                <i class="bi bi-arrow-down"></i>
-                            </button>
-                        </form>
-                        <form method="post" action="{% url 'routes:stage_delete' pk=stage.pk %}"
-                              onsubmit="return confirm('Удалить этап «{{ stage.title }}» со всеми заданиями?')">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+        <div id="stages-container"></div>
 
-                <!-- Tasks -->
-                {% if stage.tasks.all %}
-                    <div class="list-group list-group-flush">
-                        {% for task in stage.tasks.all %}
-                        <div class="list-group-item task-row px-4 py-2">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted small me-2">{{ task.order }}.</span>
-                                    <span class="fw-500 small">{{ task.title }}</span>
-                                    {% if task.article %}
-                                        <span class="badge category-badge ms-2">
-                                            <i class="bi bi-journal-text me-1"></i>{{ task.article.title|truncatechars:20 }}
-                                        </span>
-                                    {% endif %}
-                                    {% if task.trainer_task %}
-                                        <span class="badge badge-trainer ms-1">
-                                            <i class="bi bi-bug me-1"></i>{{ task.trainer_task.title|truncatechars:20 }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                                <form method="post" action="{% url 'routes:task_delete' pk=task.pk %}"
-                                      onsubmit="return confirm('Удалить задание «{{ task.title }}»?')">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            {% if task.description %}
-                                <div class="text-muted small mt-1 ms-4">{{ task.description|truncatechars:80 }}</div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
+        <!-- Add stage -->
+        <div class="card shadow-sm mt-2">
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <input type="text" id="new-stage-title" class="form-control"
+                               placeholder="Название нового этапа"
+                               onkeydown="if(event.key==='Enter'){event.preventDefault();addStage();}">
                     </div>
-                {% endif %}
-
-                <!-- Add task form -->
-                <div class="card-footer bg-light px-4 py-3">
-                    <form method="post" action="{% url 'routes:task_create' stage_pk=stage.pk %}" class="row g-2 align-items-end">
-                        {% csrf_token %}
-                        <div class="col-sm-5">
-                            <input type="text" name="title" class="form-control form-control-sm"
-                                   placeholder="Название задания" required>
-                        </div>
-                        <div class="col-sm-3">
-                            <select name="article" class="form-select form-select-sm">
-                                <option value="">— статья —</option>
-                                {% for art in task_form.fields.article.queryset %}
-                                    <option value="{{ art.pk }}">{{ art.title|truncatechars:25 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <select name="trainer_task" class="form-select form-select-sm">
-                                <option value="">— тренажёр —</option>
-                                {% for tt in task_form.fields.trainer_task.queryset %}
-                                    <option value="{{ tt.pk }}">{{ tt.title|truncatechars:25 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-sm-1">
-                            <button type="submit" class="btn btn-sm btn-primary w-100" title="Добавить задание">
-                                <i class="bi bi-plus-lg"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="text-center py-4 border rounded-3 text-muted mb-3">
-                <i class="bi bi-layers fs-2 opacity-50 d-block mb-2"></i>
-                Этапов пока нет. Добавьте первый этап.
-            </div>
-        {% endif %}
-
-        <!-- Add stage form -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white px-4 py-3 border-bottom">
-                <h6 class="mb-0 fw-500"><i class="bi bi-plus-circle me-2 text-primary"></i>Добавить этап</h6>
-            </div>
-            <div class="card-body p-4">
-                <form method="post" action="{% url 'routes:stage_create' template_pk=tmpl.pk %}" class="row g-2 align-items-end">
-                    {% csrf_token %}
-                    <div class="col-sm-7">
-                        <label class="form-label fw-500 small">Название этапа</label>
-                        <input type="text" name="title" class="form-control" placeholder="Например: Знакомство с командой" required>
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="form-label fw-500 small">Порядок</label>
-                        <input type="number" name="order" class="form-control" value="{{ stages|length }}" min="0">
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-plus-lg me-1"></i>Добавить
+                    <div class="col-auto">
+                        <button class="btn btn-primary" onclick="addStage()">
+                            <i class="bi bi-plus-lg me-1"></i>Добавить этап
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Right: template info edit -->
+    <!-- Right: template settings -->
     <div class="col-lg-4">
         <div class="card shadow-sm">
             <div class="card-header bg-white px-4 py-3 border-bottom">
                 <h6 class="mb-0 fw-500"><i class="bi bi-info-circle me-2 text-primary"></i>Настройки шаблона</h6>
             </div>
             <div class="card-body p-4">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="save_template" value="1">
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label fw-500 small">{{ field.label }}</label>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
-                    <button type="submit" class="btn btn-outline-primary w-100 btn-sm">
-                        <i class="bi bi-save me-1"></i>Сохранить настройки
-                    </button>
-                </form>
+                <div class="mb-3">
+                    <label class="form-label fw-500 small">Название *</label>
+                    <input type="text" id="tmpl-name" class="form-control"
+                           value="{{ tmpl.name }}" oninput="syncTemplate()">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-500 small">Целевая роль</label>
+                    <select id="tmpl-target-role" class="form-select" onchange="syncTemplate()">
+                        {% for value, label in role_choices %}
+                        <option value="{{ value }}" {% if tmpl.target_role == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-500 small">Отдел</label>
+                    <input type="text" id="tmpl-department" class="form-control"
+                           value="{{ tmpl.department }}" oninput="syncTemplate()">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-500 small">Проект</label>
+                    <input type="text" id="tmpl-project" class="form-control"
+                           value="{{ tmpl.project }}" oninput="syncTemplate()">
+                </div>
             </div>
         </div>
 
@@ -191,11 +108,11 @@
                 <div class="small text-muted d-flex flex-column gap-1">
                     <div class="d-flex justify-content-between">
                         <span>Этапов:</span>
-                        <strong>{{ stages|length }}</strong>
+                        <strong id="stat-stages">{{ stages|length }}</strong>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Заданий:</span>
-                        <strong>{{ tmpl.task_count }}</strong>
+                        <strong id="stat-tasks">{{ tmpl.task_count }}</strong>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Создан:</span>
@@ -204,6 +121,275 @@
                 </div>
             </div>
         </div>
+
+        <div class="mt-3">
+            <form method="post" action="{% url 'routes:delete' pk=tmpl.pk %}"
+                  onsubmit="return confirm('Удалить шаблон «{{ tmpl.name }}»? Это действие необратимо.')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                    <i class="bi bi-trash me-1"></i>Удалить шаблон
+                </button>
+            </form>
+        </div>
     </div>
 </div>
+
+<!-- Initial data for JS -->
+<script>
+const CSRF = '{{ csrf_token }}';
+const SAVE_URL = '{% url "routes:save" pk=tmpl.pk %}';
+const ARTICLES = {{ articles_json|safe }};
+const TRAINER_TASKS = {{ trainer_tasks_json|safe }};
+
+// Начальное состояние (загружается из БД через Python-сериализацию)
+let state = {{ initial_state_json|safe }};
+
+let unsaved = false;
+
+function esc(str) {
+    return String(str ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function markUnsaved() {
+    unsaved = true;
+    document.getElementById('unsaved-badge').classList.remove('d-none');
+}
+
+function syncTemplate() {
+    state.template.name = document.getElementById('tmpl-name').value;
+    state.template.target_role = document.getElementById('tmpl-target-role').value;
+    state.template.department = document.getElementById('tmpl-department').value;
+    state.template.project = document.getElementById('tmpl-project').value;
+    document.getElementById('header-name').textContent = state.template.name || '—';
+    document.getElementById('breadcrumb-name').textContent = state.template.name || '—';
+    markUnsaved();
+}
+
+// ── Этапы ──────────────────────────────────────────────────────────────────
+
+function addStage() {
+    const input = document.getElementById('new-stage-title');
+    const title = input.value.trim();
+    if (!title) { input.focus(); return; }
+    state.stages.push({ pk: null, title, tasks: [] });
+    input.value = '';
+    renderStages();
+    markUnsaved();
+}
+
+function deleteStage(idx) {
+    if (!confirm('Удалить этап «' + state.stages[idx].title + '» со всеми его заданиями?')) return;
+    state.stages.splice(idx, 1);
+    renderStages();
+    markUnsaved();
+}
+
+function moveStage(idx, dir) {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= state.stages.length) return;
+    [state.stages[idx], state.stages[newIdx]] = [state.stages[newIdx], state.stages[idx]];
+    renderStages();
+    markUnsaved();
+}
+
+// ── Задания ────────────────────────────────────────────────────────────────
+
+function addTask(stageIdx) {
+    const titleEl  = document.getElementById('nt-title-' + stageIdx);
+    const artEl    = document.getElementById('nt-art-'   + stageIdx);
+    const trainEl  = document.getElementById('nt-train-' + stageIdx);
+    const title = titleEl.value.trim();
+    if (!title) { titleEl.focus(); return; }
+
+    const article_pk    = artEl.value   ? parseInt(artEl.value)   : null;
+    const trainer_pk    = trainEl.value ? parseInt(trainEl.value) : null;
+    const article_title = article_pk  ? artEl.options[artEl.selectedIndex].text   : '';
+    const trainer_title = trainer_pk  ? trainEl.options[trainEl.selectedIndex].text : '';
+
+    state.stages[stageIdx].tasks.push({
+        pk: null, title,
+        description: '',
+        article_pk, article_title,
+        trainer_task_pk: trainer_pk,
+        trainer_task_title: trainer_title
+    });
+    titleEl.value = ''; artEl.value = ''; trainEl.value = '';
+    renderStages();
+    markUnsaved();
+}
+
+function deleteTask(stageIdx, taskIdx) {
+    const t = state.stages[stageIdx].tasks[taskIdx];
+    if (!confirm('Удалить задание «' + t.title + '»?')) return;
+    state.stages[stageIdx].tasks.splice(taskIdx, 1);
+    renderStages();
+    markUnsaved();
+}
+
+// ── Рендер ─────────────────────────────────────────────────────────────────
+
+function articleOptions() {
+    return ARTICLES.map(a =>
+        `<option value="${a.pk}">${esc(a.title.substring(0,30))}</option>`
+    ).join('');
+}
+function trainerOptions() {
+    return TRAINER_TASKS.map(t =>
+        `<option value="${t.pk}">${esc(t.title.substring(0,30))}</option>`
+    ).join('');
+}
+
+function renderStages() {
+    const container = document.getElementById('stages-container');
+    updateStats();
+
+    if (!state.stages.length) {
+        container.innerHTML = `
+            <div class="text-center py-5 border rounded-3 text-muted mb-2">
+                <i class="bi bi-layers fs-2 opacity-50 d-block mb-2"></i>
+                Этапов пока нет. Добавьте первый этап ниже.
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = state.stages.map((stage, idx) => `
+    <div class="card shadow-sm mb-3 stage-card">
+        <div class="card-header bg-white px-4 py-3 d-flex align-items-center gap-2">
+            <span class="badge bg-secondary flex-shrink-0" style="font-size:0.7rem;">${idx + 1}</span>
+            <input type="text" class="form-control stage-title-input flex-grow-1"
+                   value="${esc(stage.title)}"
+                   title="Нажмите для редактирования названия этапа"
+                   onchange="state.stages[${idx}].title=this.value; markUnsaved();">
+            <span class="text-muted small flex-shrink-0">(${stage.tasks.length} заданий)</span>
+            <div class="d-flex gap-1 ms-auto flex-shrink-0">
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                        onclick="moveStage(${idx},-1)" title="Выше" ${idx===0?'disabled':''}>
+                    <i class="bi bi-arrow-up"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2"
+                        onclick="moveStage(${idx},1)" title="Ниже" ${idx===state.stages.length-1?'disabled':''}>
+                    <i class="bi bi-arrow-down"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                        onclick="deleteStage(${idx})" title="Удалить этап">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        ${stage.tasks.length ? `
+        <div class="list-group list-group-flush">
+            ${stage.tasks.map((task, tIdx) => `
+            <div class="list-group-item task-row px-4 py-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small me-2">${tIdx+1}.</span>
+                        <span class="fw-500 small">${esc(task.title)}</span>
+                        ${task.article_pk ? `<span class="badge category-badge ms-2">
+                            <i class="bi bi-journal-text me-1"></i>${esc(task.article_title.substring(0,20))}</span>` : ''}
+                        ${task.trainer_task_pk ? `<span class="badge badge-trainer ms-1">
+                            <i class="bi bi-bug me-1"></i>${esc(task.trainer_task_title.substring(0,20))}</span>` : ''}
+                    </div>
+                    <div class="d-flex gap-1">
+                        ${task.pk ? `<a href="/routes/task/${task.pk}/edit/"
+                            class="btn btn-sm btn-outline-secondary py-0 px-2" title="Подробнее">
+                            <i class="bi bi-pencil"></i></a>` : ''}
+                        <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                                onclick="deleteTask(${idx},${tIdx})">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                ${task.description ? `<div class="text-muted small mt-1 ms-4">${esc(task.description.substring(0,80))}</div>` : ''}
+            </div>`).join('')}
+        </div>` : ''}
+
+        <!-- Добавить задание -->
+        <div class="card-footer bg-light px-4 py-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-sm-5">
+                    <input type="text" id="nt-title-${idx}" class="form-control form-control-sm"
+                           placeholder="Название задания"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();addTask(${idx});}">
+                </div>
+                <div class="col-sm-3">
+                    <select id="nt-art-${idx}" class="form-select form-select-sm">
+                        <option value="">— статья —</option>
+                        ${articleOptions()}
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <select id="nt-train-${idx}" class="form-select form-select-sm">
+                        <option value="">— тренажёр —</option>
+                        ${trainerOptions()}
+                    </select>
+                </div>
+                <div class="col-sm-1">
+                    <button class="btn btn-sm btn-primary w-100" onclick="addTask(${idx})" title="Добавить задание">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>`).join('');
+}
+
+function updateStats() {
+    const totalTasks = state.stages.reduce((s, st) => s + st.tasks.length, 0);
+    document.getElementById('stat-stages').textContent = state.stages.length;
+    document.getElementById('stat-tasks').textContent = totalTasks;
+}
+
+// ── Сохранение ─────────────────────────────────────────────────────────────
+
+async function saveAll() {
+    // Синхронизируем поля шаблона перед отправкой
+    syncTemplate();
+
+    if (!state.template.name.trim()) {
+        alert('Укажите название шаблона.');
+        document.getElementById('tmpl-name').focus();
+        return;
+    }
+
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Сохранение…';
+
+    try {
+        const resp = await fetch(SAVE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+            body: JSON.stringify(state)
+        });
+        const data = await resp.json();
+
+        if (data.ok) {
+            unsaved = false;
+            document.getElementById('unsaved-badge').classList.add('d-none');
+            btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Сохранено!';
+            btn.classList.replace('btn-success', 'btn-outline-success');
+            // Перезагружаем страницу, чтобы получить актуальные PK новых записей
+            setTimeout(() => { window.location.reload(); }, 900);
+        } else {
+            alert('Ошибка: ' + (data.error || 'неизвестная ошибка'));
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-save me-1"></i>Сохранить изменения';
+        }
+    } catch (e) {
+        alert('Сетевая ошибка: ' + e.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save me-1"></i>Сохранить изменения';
+    }
+}
+
+// Предупреждение при уходе без сохранения
+window.addEventListener('beforeunload', e => {
+    if (unsaved) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// Первоначальный рендер
+renderStages();
+</script>
 {% endblock %}

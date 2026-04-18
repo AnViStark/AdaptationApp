@@ -3,6 +3,16 @@ from django import forms
 from .models import Article, Category
 
 
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name']
+        labels = {'name': 'Название категории'}
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Например: Правила компании'}),
+        }
+
+
 class ArticleForm(forms.ModelForm):
     new_category = forms.CharField(
         required=False,

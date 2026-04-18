@@ -139,7 +139,9 @@ class AdaptationRoute(models.Model):
         return f'Маршрут {self.user} — {self.template.name}'
 
     def total_tasks(self):
-        return self.task_progress.count()
+        # Считаем задания из шаблона, а не записи прогресса —
+        # чтобы изменения шаблона сразу отражались в счётчике.
+        return Task.objects.filter(stage__template=self.template).count()
 
     def completed_tasks(self):
         return self.task_progress.filter(completed=True).count()

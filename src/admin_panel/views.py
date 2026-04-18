@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import TrainerTaskForm, UserCreateForm
+from .forms import AchievementForm, TrainerTaskForm, UserCreateForm, UserEditForm
 from .models import SystemSettings
 
 User = get_user_model()
@@ -190,3 +190,160 @@ def trainer_task_delete_view(request, pk):
         task.delete()
         messages.success(request, 'Задание удалено.')
     return redirect('admin_panel:trainer')
+
+
+# ─── User edit / delete ───────────────────────────────────────────────────────
+
+@admin_required
+def user_edit_view(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Пользователь {user} обновлён.')
+            return redirect('admin_panel:users')
+    else:
+        form = UserEditForm(instance=user)
+    return render(request, 'admin_panel/user_edit.html', {'form': form, 'edited_user': user})
+
+
+@admin_required
+def user_delete_view(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if user == request.user:
+        messages.error(request, 'Нельзя удалить собственную учётную запись.')
+        return redirect('admin_panel:users')
+    if request.method == 'POST':
+        name = str(user)
+        user.delete()
+        messages.success(request, f'Пользователь «{name}» удалён.')
+        return redirect('admin_panel:users')
+    return render(request, 'admin_panel/user_confirm_delete.html', {'edited_user': user})
+
+
+# ─── Achievements management ──────────────────────────────────────────────────
+
+@admin_required
+def achievements_view(request):
+    from gamification.models import Achievement
+    achievements = Achievement.objects.prefetch_related('user_achievements__user').all()
+    all_users = User.objects.filter(is_active=True).order_by('last_name', 'first_name')
+    return render(request, 'admin_panel/achievements.html', {
+        'achievements': achievements,
+        'all_users': all_users,
+    })
+
+
+@admin_required
+def achievement_create_view(request):
+    if request.method == 'POST':
+        form = AchievementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Достижение создано.')
+            return redirect('admin_panel:achievements')
+    else:
+        form = AchievementForm()
+    return render(request, 'admin_panel/achievement_form.html', {
+        'form': form, 'page_title': 'Новое достижение',
+    })
+
+
+@admin_required
+def achievement_edit_view(request, pk):
+    from gamification.models import Achievement
+    achievement = get_object_or_404(Achievement, pk=pk)
+    if request.method == 'POST':
+        form = AchievementForm(request.POST, instance=achievement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Достижение обновлено.')
+            return redirect('admin_panel:achievements')
+    else:
+        form = AchievementForm(instance=achievement)
+    return render(request, 'admin_panel/achievement_form.html', {
+        'form': form, 'page_title': 'Редактировать достижение', 'achievement': achievement,
+    })
+
+
+@admin_required
+def achievement_delete_view(request, pk):
+    from gamification.models import Achievement
+    achievement = get_object_or_404(Achievement, pk=pk)
+    if request.method == 'POST':
+        achievement.delete()
+        messages.success(request, 'Достижение удалено.')
+    return redirect('admin_panel:achievements')
+
+
+@admin_required
+def achievement_award_view(request, pk):
+    """Вручить достижение пользователю."""
+    from gamification.models import Achievement, UserAchievement
+    achievement = get_object_or_404(Achievement, pk=pk)
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        user = get_object_or_404(User, pk=user_id)
+        _, created = UserAchievement.objects.get_or_create(user=user, achievement=achievement)
+        if created:
+            messages.success(request, f'Достижение «{achievement.name}» выдано пользователю {user}.')
+        else:
+            messages.info(request, f'Пользователь {user} уже имеет это достижение.')
+    return redirect('admin_panel:achievements')
+
+
+@admin_required
+def achievement_revoke_view(request, pk):
+    """Отозвать достижение у пользователя."""
+    from gamification.models import UserAchievement
+    ua = get_object_or_404(UserAchievement, pk=pk)
+    if request.method == 'POST':
+        ua.delete()
+        messages.success(request, 'Достижение отозвано.')
+    return redirect('admin_panel:achievements')
+
+
+# ─── Assigned routes management ───────────────────────────────────────────────
+
+@admin_required
+def assigned_routes_view(request):
+    from adaptation.models import AdaptationRoute
+    routes = AdaptationRoute.objects.select_related(
+        'user', 'template', 'mentor', 'assigned_by'
+    ).order_by('-started_at')
+    return render(request, 'admin_panel/assigned_routes.html', {'routes': routes})
+
+
+@admin_required
+def assigned_route_deactivate_view(request, pk):
+    from adaptation.models import AdaptationRoute
+    route = get_object_or_404(AdaptationRoute, pk=pk)
+    if request.method == 'POST':
+        route.is_active = not route.is_active
+        route.save(update_fields=['is_active'])
+        status = 'активирован' if route.is_active else 'деактивирован'
+        messages.success(request, f'Маршрут {status}.')
+    return redirect('admin_panel:assigned_routes')
+
+
+@admin_required
+def assigned_route_delete_view(request, pk):
+    from adaptation.models import AdaptationRoute
+    route = get_object_or_404(AdaptationRoute, pk=pk)
+    if request.method == 'POST':
+        route.delete()
+        messages.success(request, 'Маршрут удалён.')
+        return redirect('admin_panel:assigned_routes')
+    return render(request, 'admin_panel/route_confirm_delete.html', {'route': route})
+
+
+# ─── Trainer submissions list ─────────────────────────────────────────────────
+
+@admin_required
+def submissions_view(request):
+    from trainer.models import TrainerSubmission
+    submissions = TrainerSubmission.objects.select_related(
+        'task', 'user', 'review__mentor'
+    ).order_by('-submitted_at')
+    return render(request, 'admin_panel/submissions.html', {'submissions': submissions})

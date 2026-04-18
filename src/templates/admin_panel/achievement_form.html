@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }} — Администрирование{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:index' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-shield-lock me-1"></i>Администрирование
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:achievements' %}" class="text-primary text-decoration-none">Достижения</a>
+        </li>
+        <li class="breadcrumb-item active">{{ page_title }}</li>
+    </ol>
+</nav>
+<h1 class="h3 mb-4">{{ page_title }}</h1>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-500">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.name == 'icon_name' %}
+                                <div class="text-muted small mt-1">
+                                    Имя иконки из <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Icons</a>
+                                    (например: <code>award</code>, <code>star-fill</code>, <code>trophy</code>)
+                                </div>
+                            {% endif %}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if form.icon_name.value %}
+                    <div class="mb-3">
+                        <span class="text-muted small">Предпросмотр:</span>
+                        <i class="bi bi-{{ form.icon_name.value }} fs-3 ms-2 text-primary"></i>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Сохранить
+                        </button>
+                        <a href="{% url 'admin_panel:achievements' %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

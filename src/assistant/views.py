@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 logger = logging.getLogger(__name__)
@@ -35,9 +35,9 @@ def ask_view(request):
     if not question:
         return JsonResponse({'error': 'empty question'}, status=400)
 
-    answer, sources = _rag_query(question)
-
     history = request.session.get('chat_history', [])
+    answer, sources = _rag_query(question, history)
+
     history.append({'role': 'user', 'text': question})
     history.append({'role': 'wade', 'text': answer, 'sources': sources})
     request.session['chat_history'] = history[-40:]
@@ -51,10 +51,10 @@ def clear_history_view(request):
     if request.method == 'POST':
         request.session['chat_history'] = []
         request.session.modified = True
-    return JsonResponse({'ok': True})
+    return redirect('assistant:chat')
 
 
-def _rag_query(question):
+def _rag_query(question, history=None):
     """Perform RAG: embed question → search Chroma → call Ollama."""
     try:
         import chromadb
@@ -98,14 +98,16 @@ def _rag_query(question):
             'Если нужной информации в контексте нет — честно скажи об этом. '
             'Отвечай на русском языке.'
         )
+        messages = [{'role': 'system', 'content': system_prompt}]
+        for entry in (history or [])[-10:]:
+            role = 'assistant' if entry['role'] == 'wade' else 'user'
+            messages.append({'role': role, 'content': entry['text']})
+        messages.append({'role': 'user', 'content': f'Контекст:\n{context}\n\nВопрос: {question}'})
         gen_resp = requests.post(
             f'{llm_url}/v1/chat/completions',
             json={
                 'model': ollama_model,
-                'messages': [
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user', 'content': f'Контекст:\n{context}\n\nВопрос: {question}'},
-                ],
+                'messages': messages,
                 'stream': False,
             },
             timeout=600,

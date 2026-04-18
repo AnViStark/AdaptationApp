@@ -107,11 +107,20 @@ def adaptation_view(request):
 @login_required
 def complete_task_view(request, task_id):
     """AJAX-эндпоинт: отмечает задание выполненным и начисляет баллы."""
+    from .models import Task
+
     route = _get_active_route(request.user)
     if route is None:
         return JsonResponse({'error': 'Маршрут не найден'}, status=404)
 
-    progress = get_object_or_404(UserTaskProgress, route=route, task_id=task_id)
+    # Проверяем, что задание принадлежит шаблону этого маршрута
+    task = get_object_or_404(Task, pk=task_id, stage__template=route.template)
+
+    # get_or_create на случай, если шаблон обновился после назначения маршрута
+    progress, _ = UserTaskProgress.objects.get_or_create(
+        route=route, task=task,
+        defaults={'completed': False},
+    )
 
     if progress.completed:
         return JsonResponse({

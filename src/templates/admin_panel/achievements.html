@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Достижения — Администрирование{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:index' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-shield-lock me-1"></i>Администрирование
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Достижения</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0">Достижения</h1>
+    <a href="{% url 'admin_panel:achievement_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Новое достижение
+    </a>
+</div>
+
+{% if achievements %}
+    {% for achievement in achievements %}
+    <div class="card shadow-sm mb-3">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-start justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-2" style="background: rgba(30,207,255,0.1);">
+                        <i class="bi bi-{{ achievement.icon_name }} fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-500">{{ achievement.name }}</h6>
+                        <div class="text-muted small">{{ achievement.description }}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">
+                            Ключ: <code>{{ achievement.condition_key }}</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'admin_panel:achievement_edit' pk=achievement.pk %}"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form method="post" action="{% url 'admin_panel:achievement_delete' pk=achievement.pk %}"
+                          onsubmit="return confirm('Удалить достижение «{{ achievement.name }}»?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users who have this achievement -->
+            {% if achievement.user_achievements.all %}
+            <div class="mt-3 pt-3 border-top">
+                <div class="small text-muted mb-2">Выдано пользователям:</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for ua in achievement.user_achievements.all %}
+                    <div class="d-flex align-items-center gap-1 badge bg-light text-dark border">
+                        <span>{{ ua.user.get_full_name|default:ua.user.username }}</span>
+                        <form method="post" action="{% url 'admin_panel:achievement_revoke' pk=ua.pk %}"
+                              onsubmit="return confirm('Отозвать достижение у {{ ua.user }}?')" class="mb-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link p-0 ms-1 text-danger" style="font-size:0.75rem;" title="Отозвать">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Award to user -->
+            <div class="mt-3">
+                <form method="post" action="{% url 'admin_panel:achievement_award' pk=achievement.pk %}"
+                      class="d-flex gap-2 align-items-center">
+                    {% csrf_token %}
+                    <select name="user_id" class="form-select form-select-sm" style="max-width:220px;" required>
+                        <option value="">— выдать пользователю —</option>
+                        {% for u in all_users %}
+                            <option value="{{ u.pk }}">{{ u.get_full_name|default:u.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-award me-1"></i>Выдать
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5 border rounded-3 text-muted">
+        <i class="bi bi-award fs-1 opacity-50 d-block mb-2"></i>
+        Достижений пока нет. Создайте первое.
+    </div>
+{% endif %}
+{% endblock %}

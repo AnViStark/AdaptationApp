@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать пользователя — Администрирование{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:index' %}" class="text-primary text-decoration-none">
+                <i class="bi bi-shield-lock me-1"></i>Администрирование
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:users' %}" class="text-primary text-decoration-none">Пользователи</a>
+        </li>
+        <li class="breadcrumb-item active">{{ edited_user }}</li>
+    </ol>
+</nav>
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0">Редактировать: {{ edited_user }}</h1>
+    {% if edited_user != request.user %}
+    <form method="post" action="{% url 'admin_panel:user_delete' user_id=edited_user.pk %}"
+          onsubmit="return confirm('Удалить пользователя «{{ edited_user }}»? Это действие необратимо.')">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash me-1"></i>Удалить пользователя
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-500 small">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% for e in form.first_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-500 small">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% for e in form.last_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-500 small">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-500 small">{{ form.username.label }}</label>
+                            {{ form.username }}
+                            {% for e in form.username.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.role.label }}</label>
+                            {{ form.role }}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.department.label }}</label>
+                            {{ form.department }}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.project.label }}</label>
+                            {{ form.project }}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.start_date.label }}</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.points.label }}</label>
+                            {{ form.points }}
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="form-label fw-500 small">{{ form.level.label }}</label>
+                            {{ form.level }}
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-500 small">{{ form.new_password.label }}</label>
+                            {{ form.new_password }}
+                            {% for e in form.new_password.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-sm-6 d-flex align-items-end">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label fw-500 small" for="{{ form.is_active.id_for_label }}">
+                                    {{ form.is_active.label }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Сохранить
+                        </button>
+                        <a href="{% url 'admin_panel:users' %}" class="btn btn-outline-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

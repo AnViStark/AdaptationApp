@@ -79,6 +79,72 @@
             </div>
         </a>
     </div>
+
+    <!-- Achievements -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:achievements' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(255,193,7,0.1);">
+                            <i class="bi bi-award-fill" style="color: #e6a800;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Достижения</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Создание и выдача достижений сотрудникам за успехи в адаптации.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Assigned routes -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:assigned_routes' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(102,16,242,0.1);">
+                            <i class="bi bi-map-fill" style="color: #6610f2;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Назначенные маршруты</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Просмотр, активация и удаление назначенных маршрутов адаптации.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Submissions -->
+    <div class="col-md-6 col-lg-4">
+        <a href="{% url 'admin_panel:submissions' %}" class="text-decoration-none">
+            <div class="card shadow-sm targem-card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="admin-section-icon" style="background: rgba(220,53,69,0.1);">
+                            <i class="bi bi-file-earmark-text-fill" style="color: #dc3545;"></i>
+                        </div>
+                        <h5 class="mb-0 fw-500">Работы тренажёра</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        Все поданные баг-репорты от сотрудников с результатами проверки.
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
+                    <span class="text-primary small fw-500">Перейти <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>
 
 <!-- System info -->

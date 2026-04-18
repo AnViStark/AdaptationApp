@@ -2,9 +2,75 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
+from gamification.models import Achievement
 from trainer.models import TrainerTask
 
 User = get_user_model()
+
+
+class UserEditForm(forms.ModelForm):
+    new_password = forms.CharField(
+        label='Новый пароль (оставьте пустым, чтобы не менять)',
+        required=False,
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password'}),
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'username',
+                  'role', 'department', 'project', 'start_date',
+                  'is_active', 'points', 'level']
+        labels = {
+            'first_name': 'Имя', 'last_name': 'Фамилия', 'email': 'Email',
+            'username': 'Логин', 'role': 'Роль', 'department': 'Отдел',
+            'project': 'Проект', 'start_date': 'Дата начала',
+            'is_active': 'Активен', 'points': 'Баллы', 'level': 'Уровень',
+        }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'role': forms.Select(attrs={'class': 'form-select'}),
+            'department': forms.TextInput(attrs={'class': 'form-control'}),
+            'project': forms.TextInput(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'points': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'level': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+        }
+
+    def clean_new_password(self):
+        pwd = self.cleaned_data.get('new_password')
+        if pwd:
+            validate_password(pwd)
+        return pwd
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        pwd = self.cleaned_data.get('new_password')
+        if pwd:
+            user.set_password(pwd)
+        if commit:
+            user.save()
+        return user
+
+
+class AchievementForm(forms.ModelForm):
+    class Meta:
+        model = Achievement
+        fields = ['name', 'description', 'icon_name', 'condition_key']
+        labels = {
+            'name': 'Название',
+            'description': 'Описание',
+            'icon_name': 'Иконка (Bootstrap Icons)',
+            'condition_key': 'Ключ условия (уникальный)',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'icon_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'award'}),
+            'condition_key': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'first_task_done'}),
+        }
 
 
 class UserCreateForm(forms.Form):

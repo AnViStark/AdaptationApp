@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.safestring import mark_safe
 
-from .forms import ArticleForm
+from .forms import ArticleForm, CategoryForm
 from .models import Article, Category
 
 
@@ -83,3 +83,67 @@ def article_edit_view(request, slug):
         'page_title': 'Редактировать статью',
         'article': article,
     })
+
+
+@login_required
+def article_delete_view(request, slug):
+    article = get_object_or_404(Article, slug=slug)
+    if request.user.role not in ('admin', 'hr'):
+        raise PermissionDenied
+    if request.method == 'POST':
+        category_slug = article.category.slug
+        article.delete()
+        messages.success(request, 'Статья удалена.')
+        return redirect('knowledge:category', slug=category_slug)
+    return render(request, 'knowledge/article_confirm_delete.html', {'article': article})
+
+
+@login_required
+def category_list_view(request):
+    if request.user.role not in ('admin', 'hr'):
+        raise PermissionDenied
+    form = CategoryForm()
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Категория создана.')
+            return redirect('knowledge:category_list')
+    categories = Category.objects.all().order_by('name')
+    return render(request, 'knowledge/category_list.html', {
+        'categories': categories,
+        'form': form,
+    })
+
+
+@login_required
+def category_edit_view(request, slug):
+    if request.user.role not in ('admin', 'hr'):
+        raise PermissionDenied
+    category = get_object_or_404(Category, slug=slug)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Категория обновлена.')
+            return redirect('knowledge:category_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'knowledge/category_form.html', {
+        'form': form, 'category': category, 'page_title': 'Редактировать категорию',
+    })
+
+
+@login_required
+def category_delete_view(request, slug):
+    if request.user.role not in ('admin', 'hr'):
+        raise PermissionDenied
+    category = get_object_or_404(Category, slug=slug)
+    if request.method == 'POST':
+        if category.articles.exists():
+            messages.error(request, 'Нельзя удалить категорию со статьями. Сначала удалите или перенесите статьи.')
+            return redirect('knowledge:category_list')
+        category.delete()
+        messages.success(request, 'Категория удалена.')
+        return redirect('knowledge:category_list')
+    return render(request, 'knowledge/category_confirm_delete.html', {'category': category})

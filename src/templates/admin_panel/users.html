@@ -117,21 +117,35 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if u != request.user %}
-                        <form method="post" action="{% url 'admin_panel:user_toggle' user_id=u.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
-                                    onclick="return confirm('{% if u.is_active %}Деактивировать{% else %}Активировать{% endif %} пользователя {{ u }}?')">
-                                {% if u.is_active %}
-                                    <i class="bi bi-person-slash"></i>
-                                {% else %}
-                                    <i class="bi bi-person-check"></i>
-                                {% endif %}
-                            </button>
-                        </form>
-                        {% else %}
-                            <span class="text-muted small">это вы</span>
-                        {% endif %}
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'admin_panel:user_edit' user_id=u.pk %}"
+                               class="btn btn-sm btn-outline-secondary" title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            {% if u != request.user %}
+                            <form method="post" action="{% url 'admin_panel:user_toggle' user_id=u.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                        title="{% if u.is_active %}Деактивировать{% else %}Активировать{% endif %}"
+                                        onclick="return confirm('{% if u.is_active %}Деактивировать{% else %}Активировать{% endif %} пользователя {{ u }}?')">
+                                    {% if u.is_active %}
+                                        <i class="bi bi-person-slash"></i>
+                                    {% else %}
+                                        <i class="bi bi-person-check"></i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'admin_panel:user_delete' user_id=u.pk %}"
+                                  onsubmit="return confirm('Удалить пользователя {{ u }}? Это действие необратимо.')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted small ms-1">это вы</span>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

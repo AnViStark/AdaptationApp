@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Удаление пользователя — Администрирование{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'admin_panel:users' %}" class="text-primary text-decoration-none">Пользователи</a>
+        </li>
+        <li class="breadcrumb-item active">Удаление</li>
+    </ol>
+</nav>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-1 mb-3"></i>
+                <h4 class="mb-2">Удалить пользователя?</h4>
+                <p class="text-muted mb-4">
+                    Вы собираетесь удалить <strong>{{ edited_user }}</strong> ({{ edited_user.email }}).
+                    Все связанные данные (маршруты, прогресс, достижения) будут удалены. Это действие необратимо.
+                </p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>Да, удалить
+                        </button>
+                    </form>
+                    <a href="{% url 'admin_panel:users' %}" class="btn btn-outline-secondary">Отмена</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

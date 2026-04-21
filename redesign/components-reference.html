@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Targem — Component Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="targem-tokens.css">
+<style>
+  /* Reference page only */
+  .ref-section { margin-bottom: 56px; }
+  .ref-section h2 { font-weight: 900; font-size: 28px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 24px; }
+  .ref-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+  .ref-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; margin-bottom: 20px; }
+  .ref-code { background: #f0f0f0; border-radius: 8px; padding: 16px 20px; font-family: monospace; font-size: 13px; color: #333; margin-top: 12px; white-space: pre; overflow-x: auto; }
+  body { padding: 40px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     НАВИГАЦИЯ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Навигация</h2>
+
+  <nav class="nav" style="position:relative; margin-bottom:16px;">
+    <a href="#" class="nav__logo">
+      <svg width="26" height="26" viewBox="0 0 24 24">
+        <polygon points="12,2 22,8 22,16 12,22 2,16 2,8" fill="#4DD8E8"/>
+        <polygon points="12,6.5 18,10 18,14 12,17.5 6,14 6,10" fill="#fff"/>
+        <circle cx="12" cy="12" r="2.2" fill="#4DD8E8"/>
+      </svg>
+      <span class="nav__logo-name">TARGEM</span>
+      <span class="nav__logo-sub">GAMES</span>
+    </a>
+    <div class="nav__links">
+      <a href="#" class="nav__link nav__link--active">Главная</a>
+      <a href="#" class="nav__link">Мой маршрут</a>
+      <a href="#" class="nav__link">База знаний</a>
+      <a href="#" class="nav__link">Вэйд</a>
+      <a href="#" class="nav__link">Тренажёр</a>
+      <a href="#" class="nav__link">Профиль</a>
+    </div>
+    <div class="nav__user">
+      <div class="nav__user-chip">
+        <div class="nav__avatar">АС</div>
+        <span class="nav__user-name">Анна Смирнова</span>
+      </div>
+      <button class="nav__logout">Выход</button>
+    </div>
+  </nav>
+
+  <div class="ref-code"><!-- В Django template: активный класс через request.resolver_match.url_name -->
+&lt;a href="{% url 'home' %}"
+   class="nav__link {% if request.resolver_match.url_name == 'home' %}nav__link--active{% endif %}"&gt;
+  Главная
+&lt;/a&gt;</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO БЛОК
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Hero блок (Главная)</h2>
+
+  <div class="hero">
+    <div class="hero__content">
+      <div>
+        <div class="card__eyebrow">Онбординг · QA-специалист</div>
+        <h1 class="hero__title">Добро<br>пожаловать<br>в Targem!</h1>
+        <p class="hero__subtitle">Здесь всё для успешного старта — маршрут адаптации, база знаний, тренажёр и помощник Вэйд.</p>
+      </div>
+      <div class="hero__stats">
+        <div class="stat-pill">
+          <span class="stat-pill__value">160</span>
+          <span class="stat-pill__label">Баллов</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-pill__value">2</span>
+          <span class="stat-pill__label">Уровень</span>
+        </div>
+        <div style="flex:1;">
+          <div class="flex-between mb-8">
+            <span style="font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted)">Прогресс</span>
+            <span style="font-weight:700;font-size:13px;color:var(--accent)">14 / 14</span>
+          </div>
+          <div class="xp-bar">
+            <div class="xp-bar__fill" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero__illustration">
+      <!-- Заменить на реальную иллюстрацию: -->
+      <!-- <img src="{% static 'img/hero-character.png' %}" alt=""> -->
+      <div style="text-align:center;color:#aaa;font-family:monospace;font-size:12px;">
+        <svg width="120" height="80" viewBox="0 0 120 80">
+          <defs><pattern id="p1" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#e8e8e8"/><rect width="6" height="12" fill="#dcdcdc"/></pattern></defs>
+          <rect width="120" height="80" rx="8" fill="url(#p1)"/>
+          <text x="60" y="45" text-anchor="middle" fill="#aaa" font-size="11" font-family="monospace">character art</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     КАРТОЧКИ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Карточки разделов</h2>
+
+  <div class="card-grid-4">
+    <!-- Карточка с изображением -->
+    <a href="#" class="card card--clickable" style="padding:0;overflow:hidden;">
+      <div class="card__image-area">
+        <svg width="120" height="70" viewBox="0 0 120 70"><defs><pattern id="p2" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#e8e8e8"/><rect width="6" height="12" fill="#dcdcdc"/></pattern></defs><rect width="120" height="70" fill="url(#p2)"/><text x="60" y="40" text-anchor="middle" fill="#aaa" font-size="11" font-family="monospace">Мой маршрут</text></svg>
+      </div>
+      <div class="card__body">
+        <div class="flex-between mb-8">
+          <span class="card__title" style="margin:0">Мой маршрут</span>
+          <span class="card__tag">14/14</span>
+        </div>
+        <p class="card__desc">Задания и этапы адаптации</p>
+        <span class="card__link">Открыть →</span>
+      </div>
+    </a>
+
+    <a href="#" class="card card--clickable" style="padding:0;overflow:hidden;">
+      <div class="card__image-area">
+        <svg width="120" height="70" viewBox="0 0 120 70"><defs><pattern id="p3" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#e8e8e8"/><rect width="6" height="12" fill="#dcdcdc"/></pattern></defs><rect width="120" height="70" fill="url(#p3)"/><text x="60" y="40" text-anchor="middle" fill="#aaa" font-size="11" font-family="monospace">База знаний</text></svg>
+      </div>
+      <div class="card__body">
+        <div class="flex-between mb-8">
+          <span class="card__title" style="margin:0">База знаний</span>
+          <span class="card__tag">4 раздела</span>
+        </div>
+        <p class="card__desc">Статьи и регламенты</p>
+        <span class="card__link">Открыть →</span>
+      </div>
+    </a>
+
+    <a href="#" class="card card--clickable" style="padding:0;overflow:hidden;">
+      <div class="card__image-area">
+        <svg width="120" height="70" viewBox="0 0 120 70"><defs><pattern id="p4" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#e8e8e8"/><rect width="6" height="12" fill="#dcdcdc"/></pattern></defs><rect width="120" height="70" fill="url(#p4)"/><text x="60" y="40" text-anchor="middle" fill="#aaa" font-size="11" font-family="monospace">Wade avatar</text></svg>
+      </div>
+      <div class="card__body">
+        <div class="flex-between mb-8">
+          <span class="card__title" style="margin:0">Помощник Вэйд</span>
+          <span class="card__tag">AI</span>
+        </div>
+        <p class="card__desc">Задай вопрос о компании</p>
+        <span class="card__link">Открыть →</span>
+      </div>
+    </a>
+
+    <a href="#" class="card card--clickable" style="padding:0;overflow:hidden;">
+      <div class="card__image-area">
+        <svg width="120" height="70" viewBox="0 0 120 70"><defs><pattern id="p5" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#e8e8e8"/><rect width="6" height="12" fill="#dcdcdc"/></pattern></defs><rect width="120" height="70" fill="url(#p5)"/><text x="60" y="40" text-anchor="middle" fill="#aaa" font-size="11" font-family="monospace">Тренажёр</text></svg>
+      </div>
+      <div class="card__body">
+        <div class="flex-between mb-8">
+          <span class="card__title" style="margin:0">Тренажёр</span>
+          <span class="card__tag">4 задания</span>
+        </div>
+        <p class="card__desc">Практика баг-репортов</p>
+        <span class="card__link">Открыть →</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="ref-code">{% for section in sections %}
+&lt;a href="{{ section.url }}" class="card card--clickable" style="padding:0;overflow:hidden;"&gt;
+  &lt;div class="card__image-area"&gt;
+    &lt;img src="{{ section.image_url }}" alt=""&gt;
+  &lt;/div&gt;
+  &lt;div class="card__body"&gt;
+    &lt;div class="flex-between mb-8"&gt;
+      &lt;span class="card__title" style="margin:0"&gt;{{ section.title }}&lt;/span&gt;
+      &lt;span class="card__tag"&gt;{{ section.tag }}&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;p class="card__desc"&gt;{{ section.description }}&lt;/p&gt;
+    &lt;span class="card__link"&gt;Открыть →&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/a&gt;
+{% endfor %}</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ПРОГРЕСС И СТАТЫ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Прогресс-бар и Stat Pill</h2>
+
+  <div class="ref-row">
+    <div class="stat-pill"><span class="stat-pill__value">160</span><span class="stat-pill__label">Баллов</span></div>
+    <div class="stat-pill"><span class="stat-pill__value">2</span><span class="stat-pill__label">Уровень</span></div>
+    <div style="flex:1; padding-top:8px;">
+      <div class="flex-between mb-8">
+        <span style="font-size:13px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500">Прогресс</span>
+        <span style="font-weight:700;font-size:14px;color:var(--accent)">10 из 14</span>
+      </div>
+      <div class="xp-bar xp-bar--lg"><div class="xp-bar__fill" style="width:71%"></div></div>
+    </div>
+  </div>
+
+  <div class="ref-code"><!-- Django: передай progress_pct из view -->
+&lt;div class="xp-bar xp-bar--lg"&gt;
+  &lt;div class="xp-bar__fill" style="width: {{ progress_pct }}%"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     КНОПКИ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Кнопки</h2>
+  <div class="ref-row">
+    <button class="btn btn--primary">Перейти →</button>
+    <button class="btn btn--primary btn--sm">Открыть</button>
+    <button class="btn btn--outline">Выход</button>
+    <button class="btn btn--subtle">Очистить</button>
+    <button class="btn btn--primary btn--full" style="max-width:240px">Сохранить пароль</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     БЕЙДЖИ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Бейджи / Статусы</h2>
+  <div class="ref-row">
+    <span class="badge badge--accent">Готово</span>
+    <span class="badge badge--accepted">✓ Принято</span>
+    <span class="badge badge--muted">Не начато</span>
+    <span class="badge badge--accent badge--sm">QA</span>
+    <span class="badge badge--muted badge--sm">4 раздела</span>
+  </div>
+
+  <div class="ref-code">{% if task.status == 'done' %}
+  &lt;span class="badge badge--accent"&gt;Готово&lt;/span&gt;
+{% elif task.status == 'accepted' %}
+  &lt;span class="badge badge--accepted"&gt;✓ Принято&lt;/span&gt;
+{% else %}
+  &lt;span class="badge badge--muted"&gt;Не начато&lt;/span&gt;
+{% endif %}</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ЗАДАНИЯ (чекпойнты)
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Задание в маршруте</h2>
+
+  <div style="max-width:600px; display:flex; flex-direction:column; gap:8px;">
+    <div class="task-item task-item--done">
+      <div class="task-item__check">✓</div>
+      <span class="task-item__title task-item__title--done">Познакомься с командой QA</span>
+      <span class="badge badge--accent">Готово</span>
+    </div>
+    <div class="task-item task-item--pending">
+      <div class="task-item__check task-item__check--empty"></div>
+      <span class="task-item__title">Поговори с HR о завершении испытательного срока</span>
+      <span class="badge badge--muted">Не начато</span>
+    </div>
+  </div>
+
+  <div class="ref-code">{% for task in stage.tasks %}
+&lt;div class="task-item {% if task.is_done %}task-item--done{% else %}task-item--pending{% endif %}"&gt;
+  &lt;div class="task-item__check {% if not task.is_done %}task-item__check--empty{% endif %}"&gt;
+    {% if task.is_done %}✓{% endif %}
+  &lt;/div&gt;
+  &lt;span class="task-item__title {% if task.is_done %}task-item__title--done{% endif %}"&gt;
+    {{ task.title }}
+  &lt;/span&gt;
+  {% if task.is_done %}
+    &lt;span class="badge badge--accent"&gt;Готово&lt;/span&gt;
+  {% else %}
+    &lt;span class="badge badge--muted"&gt;Не начато&lt;/span&gt;
+  {% endif %}
+&lt;/div&gt;
+{% endfor %}</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ПОЛЯ ВВОДА
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Поля ввода</h2>
+
+  <div style="max-width:500px; display:flex; flex-direction:column; gap:10px;">
+    <input class="field" type="text" placeholder="Обычное поле">
+    <input class="field field--subtle" type="text" placeholder="Поле на сером фоне">
+    <!-- Поле с кнопкой внутри -->
+    <div class="field-wrap">
+      <input class="field" type="text" placeholder="Задай вопрос Вэйду...">
+      <button class="btn btn--primary field-btn" style="padding:8px 14px;">→</button>
+    </div>
+    <!-- Поиск с кнопкой -->
+    <div class="field-wrap">
+      <input class="field" type="search" placeholder="Поиск по названию статьи...">
+      <button class="btn btn--primary field-btn">Найти</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     КАРТОЧКА ТРЕНАЖЁРА
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Карточки тренажёра</h2>
+
+  <div class="card-grid-2" style="max-width:800px;">
+    <!-- Принятое задание -->
+    <a href="#" class="card card--clickable card--accent" style="text-decoration:none;color:inherit;">
+      <div class="flex-between mb-16">
+        <h3 style="font-weight:800;font-size:20px;line-height:1.2;padding-right:12px;">Искажение текстур на арене</h3>
+        <span class="badge badge--accepted" style="flex-shrink:0;">✓ Принято</span>
+      </div>
+      <p style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:18px;">На карте «Пустошь» в режиме PvP наблюдается визуальный артефакт при движении…</p>
+      <div class="flex-between">
+        <span style="color:var(--accent);font-weight:700;font-size:16px;">⚡ 20 баллов</span>
+        <span class="card__link">Просмотреть →</span>
+      </div>
+    </a>
+
+    <!-- Новое задание -->
+    <a href="#" class="card card--clickable" style="text-decoration:none;color:inherit;">
+      <div class="flex-between mb-16">
+        <h3 style="font-weight:800;font-size:20px;line-height:1.2;padding-right:12px;">Сломанная кнопка в гараже</h3>
+        <span class="badge badge--muted" style="flex-shrink:0;">Не начато</span>
+      </div>
+      <p style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:18px;">Кнопка «Установить деталь» перестала работать после последнего обновления…</p>
+      <div class="flex-between">
+        <span style="color:var(--accent);font-weight:700;font-size:16px;">⚡ 25 баллов</span>
+        <span class="card__link">Выполнить →</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ЧАТ (ВЭЙД)
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Сообщение чата + подсказки</h2>
+
+  <div class="card" style="max-width:640px;">
+    <div class="chat-msg">
+      <div class="chat-msg__avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 11V7"/><circle cx="12" cy="5" r="2"/></svg>
+      </div>
+      <div class="chat-msg__bubble">
+        <p>Привет! Я — Вэйд, твой персональный гид по Targem Games. 🎮</p>
+        <p>Спрашивай всё хочешь — про офис, правила, процессы. Ну и немного с юмором — уж извините, такая прошивка.</p>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:18px;">
+      <div class="ref-label" style="margin-bottom:10px;">Частые вопросы</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="chip">Как оформить отгул?</button>
+        <button class="chip">Где найти регламент по баг-репортам?</button>
+        <button class="chip">Что такое Crossout?</button>
+        <button class="chip">Как работает система баллов?</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     ДОСТИЖЕНИЯ
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Бейджи достижений</h2>
+
+  <div class="card-grid-3" style="max-width:720px;">
+    <div class="achievement" style="--ach-bg:#FFF4CC;--ach-border:#F5C800;--ach-icon:#C89A00">
+      <div class="achievement__icon">⭐</div>
+      <span class="achievement__title">Сотня</span>
+      <span class="achievement__desc">Набрано 100 баллов</span>
+    </div>
+    <div class="achievement" style="--ach-bg:#CCF0FF;--ach-border:#4DD8E8;--ach-icon:#4DD8E8">
+      <div class="achievement__icon">🏆</div>
+      <span class="achievement__title">Охотник за багами</span>
+      <span class="achievement__desc">Первый баг-репорт принят</span>
+    </div>
+    <div class="achievement" style="--ach-bg:#CCFFE8;--ach-border:#2ECC71;--ach-icon:#1A9E55">
+      <div class="achievement__icon">🚩</div>
+      <span class="achievement__title">Адаптирован</span>
+      <span class="achievement__desc">Маршрут пройден полностью</span>
+    </div>
+  </div>
+
+  <div class="ref-code">{% for ach in achievements %}
+{% with colors="FFF4CC,F5C800,C89A00|CCF0FF,4DD8E8,4DD8E8|CCFFE8,2ECC71,1A9E55|F0CCFF,9B59FF,7B3FE4|FFEDCC,FF9500,CC6A00" %}
+{# Лучше передать цвет прямо из модели или view как ach.badge_color #}
+&lt;div class="achievement"
+     style="--ach-bg:#{{ ach.bg_color }};--ach-border:#{{ ach.border_color }};--ach-icon:#{{ ach.icon_color }}"&gt;
+  &lt;div class="achievement__icon"&gt;
+    &lt;img src="{{ ach.icon_url }}" width="24" height="24" alt=""&gt;
+  &lt;/div&gt;
+  &lt;span class="achievement__title"&gt;{{ ach.title }}&lt;/span&gt;
+  &lt;span class="achievement__desc"&gt;{{ ach.description }}&lt;/span&gt;
+&lt;/div&gt;
+{% endwith %}
+{% endfor %}</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     САЙДБАР: ЭТАПЫ МАРШРУТА
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Сайдбар — Этапы маршрута</h2>
+
+  <div class="sidebar-card" style="max-width:320px;">
+    <div class="sidebar-card__title">Этапы маршрута</div>
+    <div class="stage-list">
+      <div class="stage-list__item">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <div class="stage-list__check">✓</div>
+          <div>
+            <div class="stage-list__name">Знакомство с компанией</div>
+            <div class="stage-list__sub">3/3 заданий</div>
+          </div>
+        </div>
+        <span class="badge badge--accent badge--sm">Готово</span>
+      </div>
+      <div class="stage-list__item">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <div class="stage-list__check">✓</div>
+          <div>
+            <div class="stage-list__name">Рабочее место</div>
+            <div class="stage-list__sub">3/3 заданий</div>
+          </div>
+        </div>
+        <span class="badge badge--accent badge--sm">Готово</span>
+      </div>
+      <div class="stage-list__item">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+          <div class="stage-list__check" style="background:var(--border);"></div>
+          <div>
+            <div class="stage-list__name">Первые задания</div>
+            <div class="stage-list__sub">2/5 заданий</div>
+          </div>
+        </div>
+        <span class="badge badge--muted badge--sm">В процессе</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE HEADER
+     ══════════════════════════════════════════════════════════ -->
+<div class="ref-section">
+  <h2>Page Header (внутренние страницы)</h2>
+
+  <div class="page-header" style="max-width:800px;">
+    <div>
+      <div class="page-header__eyebrow">Онбординг · QA-специалист</div>
+      <h1 class="page-header__title">Мой маршрут</h1>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div class="stat-pill"><span class="stat-pill__value">160</span><span class="stat-pill__label">Баллов</span></div>
+      <div class="stat-pill"><span class="stat-pill__value">2</span><span class="stat-pill__label">Уровень</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

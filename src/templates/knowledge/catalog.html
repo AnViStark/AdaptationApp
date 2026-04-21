@@ -1,127 +1,167 @@
 {% extends 'base.html' %}
 
 {% block title %}База знаний — Targem Games{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="h3 mb-1">База знаний</h1>
-        <p class="text-muted mb-0">Корпоративные статьи и руководства</p>
-    </div>
-    {% if user.role == 'admin' or user.role == 'hr' %}
-    <div class="d-flex gap-2">
-        <a href="{% url 'knowledge:category_list' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-tags me-1"></i>Категории
-        </a>
-        <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>Новая статья
-        </a>
-    </div>
-    {% endif %}
-</div>
+<div class="page-wrap">
 
-<!-- Search -->
-<div class="card shadow-sm mb-4">
-    <div class="card-body py-3">
-        <form method="get" class="d-flex gap-2">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="bi bi-search text-muted"></i>
-                </span>
-                <input type="text" name="q" value="{{ query }}"
-                       class="form-control border-start-0 ps-0"
-                       placeholder="Поиск по названию статьи…">
-            </div>
-            <button type="submit" class="btn btn-primary px-4">Найти</button>
-            {% if query %}
-                <a href="{% url 'knowledge:catalog' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-x-lg"></i>
-                </a>
-            {% endif %}
-        </form>
-    </div>
-</div>
-
-{% if query %}
-    <!-- Search results -->
-    <h5 class="mb-3">
-        Результаты поиска: «{{ query }}»
-        {% if articles %}
-            <span class="badge bg-secondary ms-2">{{ articles|length }}</span>
+    {# Page header #}
+    <div class="page-header">
+        <div>
+            <div class="page-header__eyebrow">Targem Games</div>
+            <h1 class="page-header__title">База знаний</h1>
+        </div>
+        {% if user.role == 'admin' or user.role == 'hr' %}
+        <div style="display:flex;gap:10px;">
+            <a href="{% url 'knowledge:category_list' %}" class="btn btn--outline btn--sm">Категории</a>
+            <a href="{% url 'knowledge:create' %}" class="btn btn--primary btn--sm">+ Новая статья</a>
+        </div>
         {% endif %}
-    </h5>
-    {% if articles %}
-        <div class="row g-3">
-            {% for article in articles %}
-                <div class="col-12">
-                    <a href="{% url 'knowledge:article' slug=article.slug %}" class="text-decoration-none">
-                        <div class="card shadow-sm article-card">
-                            <div class="card-body d-flex align-items-start gap-3">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge category-badge">{{ article.category.name }}</span>
-                                    </div>
-                                    <h6 class="mb-1 text-dark">{{ article.title }}</h6>
-                                    <small class="text-muted">
-                                        <i class="bi bi-clock me-1"></i>{{ article.updated_at|date:"d.m.Y" }}
-                                    </small>
-                                </div>
-                                <i class="bi bi-chevron-right text-muted align-self-center"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-search fs-1 text-muted opacity-50 d-block mb-3"></i>
-            <p class="text-muted">Статьи с таким названием не найдены.</p>
-        </div>
-    {% endif %}
+    </div>
 
-{% else %}
-    <!-- Category grid -->
-    {% if categories %}
-        <div class="row g-4">
-            {% for category in categories %}
-                <div class="col-md-6 col-lg-4">
-                    <a href="{% url 'knowledge:category' slug=category.slug %}" class="text-decoration-none">
-                        <div class="card shadow-sm targem-card h-100">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <div class="category-icon-wrap">
-                                        <i class="bi bi-folder2-open"></i>
-                                    </div>
-                                    <h5 class="mb-0 text-dark fw-500">{{ category.name }}</h5>
-                                </div>
-                                <p class="text-muted mb-0 small">
-                                    {{ category.articles.count }}
-                                    {% with count=category.articles.count %}
-                                        {% if count == 1 %}статья{% elif count >= 2 and count <= 4 %}статьи{% else %}статей{% endif %}
-                                    {% endwith %}
-                                </p>
-                            </div>
-                            <div class="card-footer bg-white border-0 pt-0 pb-3 px-4">
-                                <span class="text-primary small fw-500">
-                                    Открыть <i class="bi bi-arrow-right ms-1"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-journal-x fs-1 text-muted opacity-50 d-block mb-3"></i>
-            <p class="text-muted">База знаний пока пуста.</p>
-            {% if user.role == 'admin' or user.role == 'hr' %}
-                <a href="{% url 'knowledge:create' %}" class="btn btn-primary">
-                    Создать первую статью
-                </a>
+    {# Search #}
+    <div class="field-wrap mb-24">
+        <form method="get" style="display:flex;gap:0;">
+            <input type="text" name="q" value="{{ query }}"
+                   class="field field--subtle"
+                   placeholder="Поиск по названию статьи…"
+                   style="border-radius:var(--radius) 0 0 var(--radius);border-right:none;">
+            <button type="submit" class="btn btn--primary" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;flex-shrink:0;">Найти</button>
+        </form>
+        {% if query %}
+        <a href="{% url 'knowledge:catalog' %}"
+           style="position:absolute;right:110px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;line-height:1;text-decoration:none;"
+           title="Очистить">×</a>
+        {% endif %}
+    </div>
+
+    {% if query %}
+        {# ── Search header ── #}
+        <div style="margin-bottom:24px;display:flex;align-items:baseline;gap:12px;">
+            <span style="font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);">
+                Результаты: «{{ query }}»
+            </span>
+            {% if text_articles or semantic_articles %}
+                <span class="badge badge--muted">
+                    {{ text_articles|length|add:semantic_articles|length }} найдено
+                </span>
             {% endif %}
         </div>
+
+        {% if not text_articles and not semantic_articles %}
+            <div style="text-align:center;padding:60px 0;color:var(--muted);">
+                <div style="font-size:48px;margin-bottom:16px;">🔍</div>
+                <p style="font-size:16px;">Ничего не найдено — попробуй другой запрос.</p>
+            </div>
+        {% endif %}
+
+        {# ── Keyword results ── #}
+        {% if text_articles %}
+        <div style="margin-bottom:32px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <span style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--muted);">
+                    По ключевым словам
+                </span>
+                <span class="badge badge--muted badge--sm">{{ text_articles|length }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                {% for article in text_articles %}
+                <a href="{% url 'knowledge:article' slug=article.slug %}" class="card card--clickable" style="padding:16px 20px;">
+                    <div style="display:flex;align-items:center;gap:14px;">
+                        <div style="width:36px;height:36px;background:var(--accent-dim);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📄</div>
+                        <div style="flex:1;min-width:0;">
+                            <span class="badge badge--muted badge--sm" style="margin-bottom:4px;">{{ article.category.name }}</span>
+                            <div style="font-weight:700;font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ article.title }}</div>
+                            <div style="font-size:13px;color:var(--muted);margin-top:2px;">{{ article.updated_at|date:"d.m.Y" }}</div>
+                        </div>
+                        <span style="color:var(--muted);font-size:18px;flex-shrink:0;">›</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Semantic results ── #}
+        {% if semantic_articles %}
+        <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <span style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--muted);">
+                    Похожие по смыслу
+                </span>
+                <span class="badge badge--accepted badge--sm">AI</span>
+                <span class="badge badge--muted badge--sm">{{ semantic_articles|length }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                {% for item in semantic_articles %}
+                <a href="{% url 'knowledge:article' slug=item.article.slug %}"
+                   class="card card--clickable"
+                   style="padding:16px 20px;border-left:3px solid var(--accent);">
+                    <div style="display:flex;align-items:flex-start;gap:14px;">
+                        <div style="width:36px;height:36px;background:var(--accent-dim);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:2px;">✨</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+                                <span class="badge badge--accepted badge--sm">{{ item.article.category.name }}</span>
+                                {# Similarity pill: green ≥80, cyan ≥65, muted below #}
+                                {% if item.similarity >= 80 %}
+                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:rgba(46,204,113,0.12);color:#1a7a42;border:1px solid rgba(46,204,113,0.3);">{{ item.similarity }}% схожесть</span>
+                                {% elif item.similarity >= 65 %}
+                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border);">{{ item.similarity }}% схожесть</span>
+                                {% else %}
+                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:var(--subtle);color:var(--muted);border:1px solid var(--border);">{{ item.similarity }}% схожесть</span>
+                                {% endif %}
+                            </div>
+                            <div style="font-weight:700;font-size:16px;color:var(--ink);margin-bottom:6px;">{{ item.article.title }}</div>
+                            {% if item.snippet %}
+                            <div style="font-size:14px;color:var(--muted);line-height:1.5;">{{ item.snippet }}</div>
+                            {% endif %}
+                        </div>
+                        <span style="color:var(--muted);font-size:18px;flex-shrink:0;margin-top:2px;">›</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        {# Category grid #}
+        {% if categories %}
+            <div class="card-grid-4">
+                {% for category in categories %}
+                <a href="{% url 'knowledge:category' slug=category.slug %}" class="card card--clickable" style="padding:0;overflow:hidden;">
+                    <div class="card__image-area" style="height:70px;">
+                        <svg width="40" height="40" viewBox="0 0 40 40">
+                            <rect width="40" height="40" rx="10" fill="rgba(77,216,232,0.15)"/>
+                            <path d="M8 28 L8 16 Q8 12 12 12 L18 12 L20 15 L32 15 Q36 15 36 19 L36 28 Q36 32 32 32 L12 32 Q8 32 8 28 Z" fill="#4DD8E8" opacity="0.7"/>
+                            <rect x="14" y="20" width="12" height="2" rx="1" fill="white" opacity="0.8"/>
+                            <rect x="14" y="25" width="8" height="2" rx="1" fill="white" opacity="0.6"/>
+                        </svg>
+                    </div>
+                    <div class="card__body">
+                        <div class="card__title" style="margin-bottom:4px;">{{ category.name }}</div>
+                        <p class="card__desc" style="margin-bottom:10px;">
+                            {{ category.articles.count }}
+                            {% with count=category.articles.count %}
+                                {% if count == 1 %}статья{% elif count >= 2 and count <= 4 %}статьи{% else %}статей{% endif %}
+                            {% endwith %}
+                        </p>
+                        <span class="card__link">Открыть →</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align:center;padding:60px 0;color:var(--muted);">
+                <div style="font-size:48px;margin-bottom:16px;">📚</div>
+                <p style="font-size:16px;">База знаний пока пуста.</p>
+                {% if user.role == 'admin' or user.role == 'hr' %}
+                    <a href="{% url 'knowledge:create' %}" class="btn btn--primary" style="margin-top:12px;">Создать первую статью</a>
+                {% endif %}
+            </div>
+        {% endif %}
     {% endif %}
-{% endif %}
+
+</div>
 {% endblock %}

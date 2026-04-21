@@ -36,9 +36,9 @@ def ask_view(request):
         return JsonResponse({'error': 'empty question'}, status=400)
 
     history = request.session.get('chat_history', [])
-    answer, sources = _rag_query(question, history)
+    answer, sources, context = _rag_query(question, history)
 
-    history.append({'role': 'user', 'text': question})
+    history.append({'role': 'user', 'text': question, 'context': context})
     history.append({'role': 'wade', 'text': answer, 'sources': sources})
     request.session['chat_history'] = history[-40:]
     request.session.modified = True
@@ -94,14 +94,19 @@ def _rag_query(question, history=None):
         system_prompt = (
             'Ты — Вэйд (W.A.D.E.), помощник по адаптации сотрудников в Targem Games. '
             'Ты человекоподобный робот — харизматичный, с юмором и лёгкой дерзостью, но всегда полезный. '
-            'Отвечай только на основе предоставленного контекста из базы знаний. '
+            'Отвечай только на основе предоставленного контекста из базы знаний. Если вопрос личный и относится к тебе как к персонажу, то можешь отвечать от себя.'
+            'Всегда обращай внимание на историю диалога.'
             'Если нужной информации в контексте нет — честно скажи об этом. '
             'Отвечай на русском языке.'
         )
         messages = [{'role': 'system', 'content': system_prompt}]
         for entry in (history or [])[-10:]:
             role = 'assistant' if entry['role'] == 'wade' else 'user'
-            messages.append({'role': role, 'content': entry['text']})
+            if role == 'user' and entry.get('context'):
+                content = f'Контекст:\n{entry["context"]}\n\nВопрос: {entry["text"]}'
+            else:
+                content = entry['text']
+            messages.append({'role': role, 'content': content})
         messages.append({'role': 'user', 'content': f'Контекст:\n{context}\n\nВопрос: {question}'})
         gen_resp = requests.post(
             f'{llm_url}/v1/chat/completions',
@@ -114,7 +119,7 @@ def _rag_query(question, history=None):
         )
         gen_resp.raise_for_status()
         answer = gen_resp.json()['choices'][0]['message']['content']
-        return answer, sources
+        return answer, sources, context
 
     except Exception as e:
         logger.warning('RAG query failed: %s', e)
@@ -122,4 +127,5 @@ def _rag_query(question, history=None):
             f'Хм, что-то пошло не так. Похоже система временно недоступна. '
             f'Попробуй позже! (Детали: {type(e).__name__})',
             [],
+            '',
         )

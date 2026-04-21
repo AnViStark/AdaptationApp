@@ -1,83 +1,73 @@
 {% extends 'base.html' %}
 
 {% block title %}Тренажёр — Targem Games{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center gap-3 mb-4">
-    <div class="rounded-3 p-3" style="background: rgba(239,159,39,0.12);">
-        <i class="bi bi-bug-fill fs-4" style="color: #c07d00;"></i>
-    </div>
-    <div>
-        <h1 class="h3 mb-0">Тренажёр</h1>
-        <p class="text-muted mb-0 small">Практика составления баг-репортов</p>
-    </div>
-</div>
+<div class="page-wrap">
 
-{% if task_data %}
-    <div class="row g-3">
-        {% for item in task_data %}
-            {% with task=item.task sub=item.submission %}
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="{% url 'trainer:detail' pk=task.pk %}" class="text-decoration-none">
-                    <div class="card shadow-sm targem-card h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-start justify-content-between mb-2">
-                                <h5 class="fw-500 text-dark mb-0" style="font-size: 1rem;">{{ task.title }}</h5>
-                                {% if sub %}
-                                    {% if sub.status == 'accepted' %}
-                                        <span class="badge ms-2 flex-shrink-0" style="background:#27AE60;">
-                                            <i class="bi bi-check-lg me-1"></i>Принято
-                                        </span>
-                                    {% elif sub.status == 'pending' %}
-                                        <span class="badge ms-2 flex-shrink-0" style="background:#EF9F27;">
-                                            <i class="bi bi-hourglass-split me-1"></i>На проверке
-                                        </span>
-                                    {% elif sub.status == 'revision' %}
-                                        <span class="badge ms-2 flex-shrink-0" style="background:#E24B4A;">
-                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Доработка
-                                        </span>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge ms-2 flex-shrink-0 bg-secondary">
-                                        Не начато
-                                    </span>
-                                {% endif %}
-                            </div>
+    {# Page header #}
+    <div class="page-header">
+        <div>
+            <div class="page-header__eyebrow">Практика · Targem Games</div>
+            <h1 class="page-header__title">Тренажёр</h1>
+        </div>
+        <p style="font-size:15px;color:var(--muted);max-width:300px;text-align:right;line-height:1.4;">Составление баг-репортов по стандарту Targem</p>
+    </div>
 
-                            <p class="text-muted small mb-3" style="
-                                display: -webkit-box;
-                                -webkit-line-clamp: 3;
-                                -webkit-box-orient: vertical;
-                                overflow: hidden;">
-                                {{ task.scenario_description }}
-                            </p>
-                        </div>
-                        <div class="card-footer bg-white border-0 pt-0 pb-3 px-4 d-flex align-items-center justify-content-between">
-                            <span class="small text-muted">
-                                <i class="bi bi-star me-1 text-primary"></i>
-                                {{ task.points_reward }} баллов
-                            </span>
-                            <span class="text-primary small fw-500">
-                                {% if sub and sub.status == 'accepted' %}
-                                    Просмотреть
-                                {% elif sub and sub.status == 'revision' %}
-                                    Исправить
-                                {% else %}
-                                    Выполнить
-                                {% endif %}
-                                <i class="bi bi-arrow-right ms-1"></i>
-                            </span>
-                        </div>
+    {% if task_data %}
+        <div class="card-grid-2">
+            {% for item in task_data %}
+                {% with task=item.task sub=item.submission %}
+                <a href="{% url 'trainer:detail' pk=task.pk %}"
+                   class="card card--clickable {% if sub and sub.status == 'accepted' %}card--accent{% endif %}"
+                   style="text-decoration:none;color:inherit;">
+                    <div class="flex-between mb-16">
+                        <h3 style="font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;color:var(--ink);padding-right:12px;">
+                            {{ task.title }}
+                        </h3>
+                        {% if sub %}
+                            {% if sub.status == 'accepted' %}
+                                <span class="badge badge--accepted" style="flex-shrink:0;">✓ Принято</span>
+                            {% elif sub.status == 'pending' %}
+                                <span class="badge" style="background:rgba(239,159,39,0.15);color:#c07d00;flex-shrink:0;">⏳ На проверке</span>
+                            {% elif sub.status == 'revision' %}
+                                <span class="badge" style="background:rgba(226,75,74,0.12);color:#c0392b;flex-shrink:0;">↩ Доработка</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge badge--muted" style="flex-shrink:0;">Не начато</span>
+                        {% endif %}
+                    </div>
+
+                    <p style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:20px;
+                               display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                        {{ task.scenario_description }}
+                    </p>
+
+                    <div class="flex-between">
+                        <span style="color:var(--accent);font-weight:700;font-size:16px;">
+                            ⚡ {{ task.points_reward }} баллов
+                        </span>
+                        <span class="card__link">
+                            {% if sub and sub.status == 'accepted' %}
+                                Просмотреть →
+                            {% elif sub and sub.status == 'revision' %}
+                                Исправить →
+                            {% else %}
+                                Выполнить →
+                            {% endif %}
+                        </span>
                     </div>
                 </a>
-            </div>
-            {% endwith %}
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-bug fs-1 text-muted opacity-50 d-block mb-3"></i>
-        <p class="text-muted">Заданий тренажёра пока нет.</p>
-    </div>
-{% endif %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align:center;padding:80px 24px;color:var(--muted);">
+            <div style="font-size:56px;margin-bottom:20px;">🐛</div>
+            <p style="font-size:17px;">Заданий тренажёра пока нет.</p>
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}

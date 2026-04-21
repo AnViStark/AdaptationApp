@@ -1,214 +1,200 @@
 {% extends 'base.html' %}
+
 {% block title %}Профиль — Targem Games{% endblock %}
+{% block main_class %}{% endblock %}
+
 {% block content %}
-<h1 class="h3 mb-4">Профиль</h1>
+<div class="page-wrap">
 
-<div class="row g-4">
-    <!-- Main info -->
-    <div class="col-lg-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body p-4 text-center">
-                <div class="mentee-avatar-lg mx-auto mb-3">
-                    {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
-                </div>
-                <h4 class="fw-500 mb-1">{{ user_obj.get_full_name|default:user_obj.username }}</h4>
-                <div class="badge category-badge mb-3">{{ user_obj.get_role_display }}</div>
-                <div class="d-flex flex-column gap-1 text-start small">
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Email</span>
-                        <span>{{ user_obj.email }}</span>
-                    </div>
-                    {% if user_obj.department %}
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Отдел</span>
-                        <span>{{ user_obj.department }}</span>
-                    </div>
-                    {% endif %}
-                    {% if user_obj.start_date %}
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">В компании с</span>
-                        <span>{{ user_obj.start_date|date:"d.m.Y" }}</span>
-                    </div>
-                    {% endif %}
-                    {% if user_obj.role == 'employee' %}
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Баллы</span>
-                        <strong class="text-primary">{{ user_obj.points }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Уровень</span>
-                        <strong>{{ user_obj.level }}</strong>
-                    </div>
-                    {% if route and route.mentor %}
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Наставник</span>
-                        <span>{{ route.mentor.get_full_name|default:route.mentor.username }}</span>
-                    </div>
-                    {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Change password -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-white px-4 py-3 border-bottom">
-                <h6 class="mb-0 fw-500"><i class="bi bi-key me-2 text-primary"></i>Сменить пароль</h6>
-            </div>
-            <div class="card-body p-4">
-                {% if pw_success %}
-                    <div class="alert alert-success py-2 small">Пароль успешно изменён.</div>
-                {% endif %}
-                {% if pw_error %}
-                    <div class="alert alert-danger py-2 small">{{ pw_error }}</div>
-                {% endif %}
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="change_password" value="1">
-                    <div class="mb-2">
-                        <input type="password" name="old_password" class="form-control form-control-sm"
-                               placeholder="Текущий пароль" required>
-                    </div>
-                    <div class="mb-2">
-                        <input type="password" name="new_password" class="form-control form-control-sm"
-                               placeholder="Новый пароль (мин. 8 символов)" required>
-                    </div>
-                    <div class="mb-3">
-                        <input type="password" name="new_password2" class="form-control form-control-sm"
-                               placeholder="Повторите новый пароль" required>
-                    </div>
-                    <button type="submit" class="btn btn-sm btn-outline-primary w-100">
-                        Сохранить пароль
-                    </button>
-                </form>
-            </div>
+    <div class="page-header">
+        <div>
+            <div class="page-header__eyebrow">Targem Games</div>
+            <h1 class="page-header__title">Профиль</h1>
         </div>
     </div>
 
-    <!-- Right column: role-specific content -->
-    <div class="col-lg-8">
+    <div class="two-col-profile">
 
-        {% if user_obj.role == 'employee' %}
-            <!-- Route progress -->
-            {% if route %}
-            <div class="card shadow-sm mb-3">
-                <div class="card-body p-4">
-                    <h5 class="fw-500 mb-3">
-                        <i class="bi bi-map me-2 text-primary"></i>Мой маршрут
-                    </h5>
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted small">{{ route.template.name }}</span>
-                        <span class="fw-500 text-primary">{{ route.progress_percent }}%</span>
+        {# Left column: avatar + meta + password #}
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+            {# User card #}
+            <div class="card card--accent" style="text-align:center;">
+                <div class="profile-avatar">
+                    {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
+                </div>
+                <h2 style="font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);margin-bottom:4px;">
+                    {{ user_obj.get_full_name|default:user_obj.username }}
+                </h2>
+                <span class="badge badge--accepted" style="margin-bottom:20px;">{{ user_obj.get_role_display }}</span>
+
+                <table class="meta-table" style="text-align:left;">
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ user_obj.email }}</td>
+                    </tr>
+                    {% if user_obj.department %}
+                    <tr>
+                        <td>Отдел</td>
+                        <td>{{ user_obj.department }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if user_obj.start_date %}
+                    <tr>
+                        <td>В компании с</td>
+                        <td>{{ user_obj.start_date|date:"d.m.Y" }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if user_obj.role == 'employee' %}
+                    <tr>
+                        <td>Баллы</td>
+                        <td style="color:var(--accent);">{{ user_obj.points }}</td>
+                    </tr>
+                    <tr>
+                        <td>Уровень</td>
+                        <td>{{ user_obj.level }}</td>
+                    </tr>
+                    {% if route and route.mentor %}
+                    <tr>
+                        <td>Наставник</td>
+                        <td>{{ route.mentor.get_full_name|default:route.mentor.username }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                </table>
+            </div>
+
+            {# Change password #}
+            <div class="card">
+                <div style="font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink);margin-bottom:16px;">
+                    Сменить пароль
+                </div>
+                {% if pw_success %}
+                    <div class="t-alert t-alert--success">Пароль успешно изменён.</div>
+                {% endif %}
+                {% if pw_error %}
+                    <div class="t-alert t-alert--danger">{{ pw_error }}</div>
+                {% endif %}
+                <form method="post" style="display:flex;flex-direction:column;gap:10px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="change_password" value="1">
+                    <input type="password" name="old_password" class="field"
+                           placeholder="Текущий пароль" required>
+                    <input type="password" name="new_password" class="field"
+                           placeholder="Новый пароль" required minlength="8">
+                    <input type="password" name="new_password2" class="field"
+                           placeholder="Повторить пароль" required>
+                    <button type="submit" class="btn btn--primary btn--full">Сохранить пароль</button>
+                </form>
+            </div>
+
+        </div>
+
+        {# Right column #}
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+            {% if user_obj.role == 'employee' %}
+
+                {# Route progress #}
+                {% if route %}
+                <div class="card card--accent">
+                    <div style="font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;color:var(--ink);">Мой маршрут</div>
+                    <div class="flex-between mb-8">
+                        <span style="font-size:15px;color:var(--muted);">{{ route.template.name }}</span>
+                        <span style="font-weight:700;font-size:15px;color:var(--accent);">{{ route.progress_percent }}%</span>
                     </div>
-                    <div class="progress mb-2" style="height: 8px;">
-                        <div class="progress-bar" style="width: {{ route.progress_percent }}%;"></div>
+                    <div class="xp-bar xp-bar--lg mb-8">
+                        <div class="xp-bar__fill" style="width: {{ route.progress_percent }}%;"></div>
                     </div>
-                    <div class="text-muted small">
+                    <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
                         {{ route.completed_tasks }} из {{ route.total_tasks }} заданий выполнено
                     </div>
-                    <a href="{% url 'adaptation:index' %}" class="btn btn-sm btn-outline-primary mt-3">
-                        Открыть маршрут <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
+                    <a href="{% url 'adaptation:index' %}" class="btn btn--primary btn--sm">Открыть маршрут →</a>
                 </div>
-            </div>
-            {% endif %}
+                {% endif %}
 
-            <!-- Achievements -->
-            {% if achievements %}
-            <div class="card shadow-sm mb-3">
-                <div class="card-body p-4">
-                    <h5 class="fw-500 mb-3">
-                        <i class="bi bi-trophy me-2 text-primary"></i>Достижения
-                    </h5>
-                    <div class="row g-2">
+                {# Achievements #}
+                {% if achievements %}
+                <div class="card">
+                    <div style="font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;color:var(--ink);">Достижения</div>
+                    <div class="card-grid-3" style="gap:12px;">
                         {% for ua in achievements %}
-                        <div class="col-sm-6">
-                            <div class="d-flex align-items-center gap-3 p-3 rounded-2"
-                                 style="background: rgba(30,207,255,0.06); border: 1px solid rgba(30,207,255,0.15);">
-                                <div style="width:40px;height:40px;border-radius:50%;background:var(--targem-primary);
-                                            display:flex;align-items:center;justify-content:center;
-                                            color:#fff;font-size:1.1rem;flex-shrink:0;">
-                                    <i class="bi bi-{{ ua.achievement.icon_name }}"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-500 small">{{ ua.achievement.name }}</div>
-                                    <div class="text-muted" style="font-size:0.75rem;">{{ ua.achievement.description }}</div>
-                                </div>
+                        {% with colors="FFF4CC,F5C800,C89A00|CCF0FF,4DD8E8,4DD8E8|CCFFE8,2ECC71,1A9E55|F0CCFF,9B59FF,7B3FE4|FFEDCC,FF9500,CC6A00" %}
+                        {% with idx=forloop.counter0 %}
+                        <div class="achievement"
+                             style="--ach-bg:#{{ ua.achievement.bg_color|default:'CCF0FF' }};--ach-border:#{{ ua.achievement.border_color|default:'4DD8E8' }};--ach-icon:#{{ ua.achievement.icon_color|default:'4DD8E8' }}">
+                            <div class="achievement__icon">
+                                <i class="bi bi-{{ ua.achievement.icon_name }}" style="color:var(--ach-icon);font-size:20px;"></i>
                             </div>
+                            <span class="achievement__title">{{ ua.achievement.name }}</span>
+                            <span class="achievement__desc">{{ ua.achievement.description }}</span>
+                        </div>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# Recent tasks #}
+                {% if recent_tasks %}
+                <div class="card">
+                    <div style="font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;color:var(--ink);">Последние действия</div>
+                    <div style="display:flex;flex-direction:column;gap:0;">
+                        {% for tp in recent_tasks %}
+                        <div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border);">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div class="task-item__check" style="width:22px;height:22px;font-size:11px;flex-shrink:0;">✓</div>
+                                <span style="font-size:15px;color:var(--ink);">{{ tp.task.title }}</span>
+                            </div>
+                            <span style="font-size:13px;color:var(--muted);white-space:nowrap;margin-left:12px;">{{ tp.completed_at|date:"d.m.Y" }}</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-            {% endif %}
+                {% endif %}
 
-            <!-- Recent activity -->
-            {% if recent_tasks %}
-            <div class="card shadow-sm">
-                <div class="card-header bg-white px-4 py-3 border-bottom">
-                    <h6 class="mb-0 fw-500"><i class="bi bi-clock-history me-2 text-primary"></i>Последние действия</h6>
-                </div>
-                <div class="list-group list-group-flush">
-                    {% for tp in recent_tasks %}
-                    <div class="list-group-item px-4 py-2 d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-check-circle-fill text-success small flex-shrink-0"></i>
-                            <span class="small">{{ tp.task.title }}</span>
-                        </div>
-                        <span class="text-muted" style="font-size:0.75rem;">{{ tp.completed_at|date:"d.m.Y" }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+            {% elif user_obj.role == 'mentor' %}
 
-        {% elif user_obj.role == 'mentor' %}
-            <!-- Mentees list -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white px-4 py-3 border-bottom">
-                    <h5 class="mb-0 fw-500">
-                        <i class="bi bi-people me-2 text-primary"></i>Мои подопечные
-                    </h5>
-                </div>
-                {% if mentees %}
-                <div class="list-group list-group-flush">
-                    {% for route in mentees %}
-                    <a href="{% url 'users:mentee_detail' user_id=route.user.pk %}"
-                       class="list-group-item list-group-item-action px-4 py-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="mentee-avatar">
+                {# Mentees list #}
+                <div class="card">
+                    <div style="font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;color:var(--ink);">Мои подопечные</div>
+                    {% if mentees %}
+                    <div style="display:flex;flex-direction:column;gap:0;">
+                        {% for route in mentees %}
+                        <a href="{% url 'users:mentee_detail' user_id=route.user.pk %}"
+                           style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;">
+                            <div style="width:38px;height:38px;border-radius:50%;background:var(--accent-dim);border:1.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--accent);flex-shrink:0;">
                                 {{ route.user.first_name|first|upper }}{{ route.user.last_name|first|upper }}
                             </div>
-                            <div class="flex-grow-1">
-                                <div class="fw-500 small">{{ route.user.get_full_name|default:route.user.username }}</div>
-                                <div class="text-muted" style="font-size:0.75rem;">{{ route.user.department|default:"—" }}</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;font-size:15px;color:var(--ink);">{{ route.user.get_full_name|default:route.user.username }}</div>
+                                <div style="font-size:13px;color:var(--muted);">{{ route.user.department|default:"—" }}</div>
                             </div>
-                            <div class="text-end">
-                                <div class="text-primary fw-500 small">{{ route.progress_percent }}%</div>
-                                <div class="progress" style="width:80px;height:4px;">
-                                    <div class="progress-bar" style="width:{{ route.progress_percent }}%;"></div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:700;font-size:15px;color:var(--accent);">{{ route.progress_percent }}%</div>
+                                <div class="xp-bar" style="width:80px;margin-top:4px;">
+                                    <div class="xp-bar__fill" style="width:{{ route.progress_percent }}%;"></div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                    {% endfor %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color:var(--muted);font-size:15px;">Подопечных нет.</p>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="card-body text-center text-muted py-4 small">
-                    Подопечных нет
-                </div>
-                {% endif %}
-            </div>
 
-        {% else %}
-            <!-- HR / Admin -->
-            <div class="card shadow-sm">
-                <div class="card-body p-4 text-center text-muted py-5">
-                    <i class="bi bi-person-badge fs-1 opacity-50 d-block mb-3"></i>
-                    <p class="mb-0">{{ user_obj.get_role_display }}</p>
+            {% else %}
+                {# HR / Admin #}
+                <div class="card" style="text-align:center;padding:60px 24px;color:var(--muted);">
+                    <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+                    <p style="font-size:17px;">{{ user_obj.get_role_display }}</p>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+
+        </div>
     </div>
+
 </div>
 {% endblock %}

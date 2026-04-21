@@ -1,0 +1,683 @@
+/* ============================================================
+   Targem Games — Design Tokens
+   Система адаптации новых сотрудников
+   
+   Подключи в base.html:
+   <link rel="stylesheet" href="{% static 'css/targem-tokens.css' %}">
+   ============================================================ */
+
+/* Google Fonts — подключи в <head> отдельно:
+   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+*/
+
+:root {
+  /* ── Цвета ────────────────────────────────────────────── */
+  --accent:       #4DD8E8;
+  --accent-dim:   rgba(77, 216, 232, 0.12);   /* фон иконок, подсветка */
+  --accent-glow:  rgba(77, 216, 232, 0.20);   /* hover-тень */
+  --accent-border:rgba(77, 216, 232, 0.35);   /* рамка акцентных блоков */
+
+  --bg:           #EAEAEA;  /* фон страницы */
+  --white:        #FFFFFF;  /* фон карточек */
+  --ink:          #1A1A1A;  /* основной текст */
+  --muted:        #777777;  /* вторичный текст */
+  --subtle:       #F4F4F4;  /* фон инпутов, тегов */
+  --border:       #E0E0E0;  /* рамки, разделители */
+
+  /* ── Типографика ──────────────────────────────────────── */
+  --font:         'Barlow Condensed', sans-serif;
+
+  --text-hero:    58px;
+  --text-h1:      48px;
+  --text-h2:      24px;
+  --text-card:    20px;
+  --text-section: 18px;
+  --text-label:   13px;
+  --text-body:    16px;
+  --text-body-sm: 13px;
+  --text-badge:   12px;
+  --text-stat:    38px;
+  --text-nav:     15px;
+  --text-btn:     15px;
+  --text-input:   17px;
+
+  /* ── Радиусы ──────────────────────────────────────────── */
+  --radius:       18px;
+  --radius-sm:    calc(var(--radius) * 0.6);  /* ~11px */
+  --radius-xs:    7px;                         /* теги, чипы */
+  --radius-circle:9999px;                     /* таблетки, аватары */
+
+  /* ── Отступы ──────────────────────────────────────────── */
+  --page-padding: 36px;
+  --page-max-w:   1140px;
+  --card-padding: 24px;
+  --card-gap:     16px;
+  --section-gap:  24px;
+
+  /* ── Навигация ────────────────────────────────────────── */
+  --nav-height:   58px;
+}
+
+
+/* ============================================================
+   Base reset & global styles
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button { font-family: var(--font); cursor: pointer; }
+input, textarea, select { font-family: var(--font); }
+
+
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+.page-wrap {
+  max-width: var(--page-max-w);
+  margin: 0 auto;
+  padding: var(--page-padding);
+}
+
+.card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--card-gap); }
+.card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--card-gap); }
+.card-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--card-gap); }
+
+.two-col-sidebar { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+.two-col-profile  { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 0;
+}
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 36px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav__logo-name {
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.nav__logo-sub {
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.nav__links { display: flex; gap: 4px; flex: 1; }
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  padding: 7px 15px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: var(--text-nav);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.nav__link:hover { color: var(--ink); text-decoration: none; }
+.nav__link--active {
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.nav__link--active:hover { color: white; }
+
+.nav__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav__user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--subtle);
+  border-radius: var(--radius-circle);
+  border: 1px solid var(--border);
+}
+.nav__avatar {
+  width: 30px; height: 30px;
+  border-radius: 30px;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: white;
+  flex-shrink: 0;
+}
+.nav__user-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+}
+.nav__logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 6px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.nav__logout:hover { border-color: var(--ink); color: var(--ink); }
+
+
+/* ============================================================
+   Cards
+   ============================================================ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--card-padding);
+}
+
+/* Акцентная карточка — с полосой сверху */
+.card--accent {
+  border-top: 4px solid var(--accent);
+}
+
+/* Hover для кликабельных карточек */
+.card--clickable {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+.card--clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px var(--accent-glow);
+  text-decoration: none;
+}
+
+/* Карточка с изображением сверху */
+.card__image-area {
+  background: var(--accent-dim);
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  /* При наличии реальной картинки: */
+  /* background-image: url(...); background-size: cover; */
+}
+.card__body {
+  padding: 18px 20px;
+}
+
+.card__eyebrow {
+  font-weight: 500;
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.card__title {
+  font-weight: 800;
+  font-size: var(--text-card);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.card__desc {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+.card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  text-decoration: none;
+}
+.card__link:hover { text-decoration: underline; }
+
+.card__tag {
+  display: inline-block;
+  background: var(--subtle);
+  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 22px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: var(--text-btn);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn--primary { background: var(--accent); color: white; }
+.btn--outline  { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn--subtle   { background: var(--subtle); border: 1px solid var(--border); color: var(--ink); }
+
+.btn--sm { padding: 7px 14px; font-size: 13px; }
+.btn--full { width: 100%; justify-content: center; }
+
+
+/* ============================================================
+   Badges / Tags
+   ============================================================ */
+.badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: var(--text-badge);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+.badge--accent   { background: var(--accent); color: white; }
+.badge--accepted { background: var(--accent-dim); color: var(--accent); }
+.badge--muted    { background: var(--subtle); color: var(--muted); }
+.badge--sm       { font-size: 10px; padding: 2px 7px; }
+
+
+/* ============================================================
+   XP / Progress Bar
+   ============================================================ */
+.xp-bar {
+  background: #D8D8D8;
+  border-radius: var(--radius);
+  height: 8px;
+  overflow: hidden;
+}
+.xp-bar--lg { height: 12px; }
+
+.xp-bar__fill {
+  background: var(--accent);
+  height: 100%;
+  border-radius: var(--radius);
+  transition: width 0.6s ease;
+}
+/* Использование: <div class="xp-bar__fill" style="width: {{ pct }}%"></div> */
+
+
+/* ============================================================
+   Stat Pill
+   ============================================================ */
+.stat-pill {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  padding: 12px 20px;
+  text-align: center;
+}
+.stat-pill__value {
+  display: block;
+  font-weight: 900;
+  font-size: var(--text-stat);
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-pill__label {
+  display: block;
+  font-weight: 500;
+  font-size: var(--text-label);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  margin-top: 3px;
+}
+
+
+/* ============================================================
+   Task item
+   ============================================================ */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: calc(var(--radius) * 0.8);
+}
+.task-item--done {
+  background: var(--accent-dim);
+  border: 1.5px solid var(--accent-border);
+}
+.task-item--pending {
+  background: var(--subtle);
+  border: 1.5px solid var(--border);
+}
+.task-item__check {
+  width: 26px; height: 26px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.task-item__check--empty {
+  background: var(--white);
+  border: 2px solid var(--border);
+}
+.task-item__title { flex: 1; font-size: 16px; font-weight: 400; }
+.task-item__title--done { text-decoration: line-through; color: var(--muted); }
+
+
+/* ============================================================
+   Form inputs
+   ============================================================ */
+.field {
+  width: 100%;
+  padding: 15px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: var(--text-input);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field:focus { border-color: var(--accent); }
+.field--subtle {
+  background: var(--subtle);
+  border-color: var(--border);
+}
+.field-wrap { position: relative; }
+.field-wrap .field { padding-right: 60px; }
+.field-wrap .field-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+
+/* ============================================================
+   Suggestion chips (Wade)
+   ============================================================ */
+.chip {
+  display: inline-block;
+  background: var(--subtle);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+
+/* ============================================================
+   Achievement badge
+   ============================================================ */
+.achievement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 12px 16px;
+  border-radius: calc(var(--radius) * 0.8);
+  border: 1.5px solid;
+  text-align: center;
+  gap: 10px;
+  /* Задай --ach-bg, --ach-border, --ach-icon через inline style */
+  background: var(--ach-bg, var(--subtle));
+  border-color: var(--ach-border, var(--border));
+}
+.achievement__icon {
+  width: 52px; height: 52px;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid var(--ach-border, var(--border));
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.achievement__icon svg { color: var(--ach-icon, var(--accent)); }
+.achievement__title { font-weight: 800; font-size: 16px; color: var(--ink); }
+.achievement__desc  { font-weight: 400; font-size: 13px; color: var(--muted); }
+
+
+/* ============================================================
+   Hero block
+   ============================================================ */
+.hero {
+  background: var(--white);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--accent);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: 260px;
+  margin-bottom: var(--section-gap);
+}
+.hero__content {
+  padding: 36px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hero__title {
+  font-weight: 900;
+  font-size: var(--text-hero);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.hero__subtitle {
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 400px;
+}
+.hero__stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 24px;
+}
+.hero__illustration {
+  background: var(--accent-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* При наличии реальной иллюстрации: */
+  /* background-image: url({% static 'img/hero-char.png' %}); */
+  /* background-size: contain; background-repeat: no-repeat; background-position: center; */
+}
+
+
+/* ============================================================
+   Page header (используется на внутренних экранах)
+   ============================================================ */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+.page-header__eyebrow {
+  font-weight: 500;
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.page-header__title {
+  font-weight: 900;
+  font-size: var(--text-h1);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+
+/* ============================================================
+   Sidebar section card
+   ============================================================ */
+.sidebar-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 22px;
+  border-top: 4px solid var(--accent);
+}
+.sidebar-card__title {
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 16px;
+}
+
+.stage-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stage-list__item:last-child { border-bottom: none; }
+.stage-list__check {
+  width: 20px; height: 20px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: white;
+  font-size: 10px;
+}
+.stage-list__name { font-weight: 600; font-size: 15px; color: var(--ink); }
+.stage-list__sub  { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 30px; }
+
+
+/* ============================================================
+   Chat message (Wade)
+   ============================================================ */
+.chat-msg {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.chat-msg__avatar {
+  width: 40px; height: 40px;
+  background: var(--accent-dim);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.chat-msg__bubble {
+  background: var(--subtle);
+  border-radius: 4px 16px 16px 16px;
+  padding: 14px 18px;
+  max-width: 480px;
+}
+.chat-msg__bubble p {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-weight: 400;
+}
+.chat-msg__bubble p + p { margin-top: 8px; }
+
+
+/* ============================================================
+   Utility
+   ============================================================ */
+.text-accent  { color: var(--accent); }
+.text-muted   { color: var(--muted); }
+.text-ink     { color: var(--ink); }
+.fw-400 { font-weight: 400; }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.fw-800 { font-weight: 800; }
+.fw-900 { font-weight: 900; }
+.uppercase { text-transform: uppercase; }
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-8  { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.flex   { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }

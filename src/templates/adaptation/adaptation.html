@@ -1,155 +1,160 @@
 {% extends 'base.html' %}
 
 {% block title %}Мой маршрут — Targem Games{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-{# Шапка: баллы и уровень #}
-<div class="d-flex align-items-center justify-content-between flex-wrap mb-4 gap-3">
-    <div>
-        <h1 class="h3 mb-1">Мой маршрут адаптации</h1>
-        <p class="text-muted mb-0">{{ route.template.name }}</p>
-    </div>
-    <div class="d-flex gap-3">
-        <div class="text-center">
-            <div class="stat-badge" id="user-points">{{ user.points }}</div>
-            <div class="stat-label">баллов</div>
-        </div>
-        <div class="text-center">
-            <div class="stat-badge stat-badge-level" id="user-level">{{ user.level }}</div>
-            <div class="stat-label">уровень</div>
-        </div>
-    </div>
-</div>
+<div class="page-wrap">
 
-{# Общий прогресс #}
-<div class="card shadow-sm mb-4">
-    <div class="card-body py-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="fw-500">Общий прогресс</span>
-            <span class="text-muted small" id="overall-progress-text">{{ completed_tasks }} из {{ total_tasks }} заданий</span>
+    {# Page header #}
+    <div class="page-header">
+        <div>
+            <div class="page-header__eyebrow">Онбординг · {{ route.template.name }}</div>
+            <h1 class="page-header__title">Мой маршрут</h1>
         </div>
-        <div class="progress" style="height: 10px;">
-            <div class="progress-bar" id="overall-progress-bar"
-                 style="width: {{ progress_percent }}%;"
-                 role="progressbar"
-                 aria-valuenow="{{ progress_percent }}"
-                 aria-valuemin="0" aria-valuemax="100"></div>
+        <div style="display:flex;gap:12px;">
+            <div class="stat-pill">
+                <span class="stat-pill__value" id="user-points">{{ user.points }}</span>
+                <span class="stat-pill__label">Баллов</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill__value" id="user-level">{{ user.level }}</span>
+                <span class="stat-pill__label">Уровень</span>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="row g-4">
-    {# Левая колонка: текущий этап #}
-    <div class="col-lg-8">
-        {% if current_stage %}
-        <div class="card shadow-sm">
-            <div class="card-header d-flex align-items-center justify-content-between">
-                <div>
-                    <span class="badge bg-primary me-2">Текущий этап</span>
-                    <strong>{{ current_stage.stage.title }}</strong>
+    {# Overall progress bar #}
+    <div class="card card--accent mb-24">
+        <div class="flex-between mb-8">
+            <span style="font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink);">Общий прогресс</span>
+            <span style="font-weight:700;font-size:14px;color:var(--accent);" id="overall-progress-text">{{ completed_tasks }} из {{ total_tasks }} заданий</span>
+        </div>
+        <div class="xp-bar xp-bar--lg">
+            <div class="xp-bar__fill" id="overall-progress-bar" style="width: {{ progress_percent }}%;"></div>
+        </div>
+    </div>
+
+    {# Two column layout: tasks | sidebar #}
+    <div class="two-col-sidebar">
+
+        {# Left: current stage tasks #}
+        <div>
+            {% if current_stage %}
+            <div class="card">
+                <div class="flex-between mb-16">
+                    <div>
+                        <div style="font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--accent);margin-bottom:4px;">Текущий этап</div>
+                        <h2 style="font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);">{{ current_stage.stage.title }}</h2>
+                    </div>
+                    <span style="font-weight:700;font-size:14px;color:var(--accent);">{{ current_stage.done }}/{{ current_stage.total }}</span>
                 </div>
-                <span class="text-muted small">{{ current_stage.done }}/{{ current_stage.total }}</span>
-            </div>
-            <div class="card-body pb-0">
-                <div class="progress mb-3" style="height: 6px;">
-                    <div class="progress-bar" style="width: {{ current_stage.percent }}%;"></div>
+                <div class="xp-bar mb-24">
+                    <div class="xp-bar__fill" style="width: {{ current_stage.percent }}%;"></div>
                 </div>
-            </div>
-            <ul class="list-group list-group-flush" id="task-list">
-                {% for item in current_stage.tasks %}
-                <li class="list-group-item task-item {% if item.completed %}task-done{% endif %}" id="task-item-{{ item.task.id }}">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="form-check mt-1">
-                            <input
-                                class="form-check-input task-checkbox"
-                                type="checkbox"
-                                id="task-cb-{{ item.task.id }}"
-                                data-task-id="{{ item.task.id }}"
-                                {% if item.completed %}checked disabled{% endif %}
-                            >
+
+                <div style="display:flex;flex-direction:column;gap:8px;" id="task-list">
+                    {% for item in current_stage.tasks %}
+                    <div class="task-item {% if item.completed %}task-item--done{% else %}task-item--pending{% endif %}"
+                         id="task-item-{{ item.task.id }}">
+                        <div class="task-item__check {% if not item.completed %}task-item__check--empty{% endif %}"
+                             id="task-check-{{ item.task.id }}">
+                            {% if item.completed %}✓{% endif %}
                         </div>
-                        <div class="flex-grow-1">
-                            <label class="form-check-label fw-500 task-label" for="task-cb-{{ item.task.id }}">
+                        <div style="flex:1;">
+                            <div class="task-item__title {% if item.completed %}task-item__title--done{% endif %}"
+                                 style="cursor:{% if not item.completed %}pointer{% else %}default{% endif %};"
+                                 id="task-title-{{ item.task.id }}"
+                                 {% if not item.completed %}data-task-id="{{ item.task.id }}" onclick="completeTask(this)"{% endif %}>
                                 {{ item.task.title }}
-                            </label>
+                            </div>
                             {% if item.task.description %}
-                                <p class="text-muted small mb-1 mt-1">{{ item.task.description }}</p>
+                                <p style="font-size:14px;color:var(--muted);margin-top:4px;line-height:1.4;">{{ item.task.description }}</p>
                             {% endif %}
-                            <div class="d-flex gap-2 mt-1 flex-wrap">
+                            {% if item.task.article or item.task.trainer_task %}
+                            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
                                 {% if item.task.article %}
-                                    <a href="{% url 'knowledge:article' slug=item.task.article.slug %}" class="badge text-decoration-none badge-link">
-                                        <i class="bi bi-book me-1"></i>{{ item.task.article.title }}
+                                    <a href="{% url 'knowledge:article' slug=item.task.article.slug %}" class="t-article-link">
+                                        📖 {{ item.task.article.title }}
                                     </a>
                                 {% endif %}
                                 {% if item.task.trainer_task %}
-                                    <a href="{% url 'trainer:detail' pk=item.task.trainer_task.id %}" class="badge text-decoration-none badge-link badge-trainer">
-                                        <i class="bi bi-bug me-1"></i>{{ item.task.trainer_task.title }}
+                                    <a href="{% url 'trainer:detail' pk=item.task.trainer_task.id %}" class="t-trainer-link">
+                                        🐛 {{ item.task.trainer_task.title }}
                                     </a>
                                 {% endif %}
                             </div>
+                            {% endif %}
                         </div>
                         {% if item.completed %}
-                            <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                            <span class="badge badge--accent">Готово</span>
+                        {% else %}
+                            <span class="badge badge--muted">Не начато</span>
                         {% endif %}
                     </div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% else %}
-        <div class="card shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-trophy-fill text-warning" style="font-size: 3rem;"></i>
-                <h4 class="mt-3">Маршрут завершён!</h4>
-                <p class="text-muted">Вы выполнили все задания. Отличная работа!</p>
+                    {% endfor %}
+                </div>
             </div>
+            {% else %}
+            <div class="card" style="text-align:center;padding:60px 24px;">
+                <div style="font-size:48px;margin-bottom:16px;">🏆</div>
+                <h3 style="font-weight:800;font-size:24px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Маршрут завершён!</h3>
+                <p style="color:var(--muted);font-size:16px;">Вы выполнили все задания. Отличная работа!</p>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
 
-    {# Правая колонка: список всех этапов #}
-    <div class="col-lg-4">
-        <div class="card shadow-sm">
-            <div class="card-header"><strong>Этапы маршрута</strong></div>
-            <ul class="list-group list-group-flush">
-                {% for s in stages_data %}
-                <li class="list-group-item d-flex align-items-center gap-2 stage-list-item
-                    {% if s == current_stage %}stage-current{% endif %}">
-                    {% if s.status == 'done' %}
-                        <i class="bi bi-check-circle-fill text-success flex-shrink-0"></i>
-                    {% elif s == current_stage %}
-                        <i class="bi bi-play-circle-fill text-primary flex-shrink-0"></i>
-                    {% else %}
-                        <i class="bi bi-circle text-muted flex-shrink-0"></i>
-                    {% endif %}
-                    <div class="flex-grow-1">
-                        <div class="small fw-500">{{ s.stage.title }}</div>
-                        <div class="text-muted" style="font-size: 0.75rem;">{{ s.done }}/{{ s.total }} заданий</div>
+        {# Right sidebar #}
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+            {# Stage list #}
+            <div class="sidebar-card">
+                <div class="sidebar-card__title">Этапы маршрута</div>
+                <div class="stage-list">
+                    {% for s in stages_data %}
+                    <div class="stage-list__item">
+                        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                            <div class="stage-list__check {% if s.status != 'done' and s != current_stage %}stage-list__check--empty{% endif %}">
+                                {% if s.status == 'done' %}✓{% elif s == current_stage %}→{% endif %}
+                            </div>
+                            <div>
+                                <div class="stage-list__name">{{ s.stage.title }}</div>
+                                <div class="stage-list__sub">{{ s.done }}/{{ s.total }} заданий</div>
+                            </div>
+                        </div>
+                        {% if s.status == 'done' %}
+                            <span class="badge badge--accent badge--sm">Готово</span>
+                        {% elif s == current_stage %}
+                            <span class="badge badge--accepted badge--sm">Сейчас</span>
+                        {% else %}
+                            <span class="badge badge--muted badge--sm">Впереди</span>
+                        {% endif %}
                     </div>
-                    {% if s.status == 'done' %}
-                        <span class="badge bg-success ms-auto">Готово</span>
-                    {% elif s == current_stage %}
-                        <span class="badge bg-primary ms-auto">Сейчас</span>
-                    {% else %}
-                        <span class="badge bg-secondary ms-auto text-white">Впереди</span>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        {% if route.mentor %}
-        <div class="card shadow-sm mt-3">
-            <div class="card-body">
-                <h6 class="card-title mb-2"><i class="bi bi-person-fill me-1 text-primary"></i>Ваш наставник</h6>
-                <p class="mb-0 fw-500">{{ route.mentor.get_full_name|default:route.mentor.username }}</p>
-                {% if route.mentor.department %}
-                    <p class="text-muted small mb-0">{{ route.mentor.department }}</p>
-                {% endif %}
+                    {% endfor %}
+                </div>
             </div>
+
+            {# Mentor block #}
+            {% if route.mentor %}
+            <div class="sidebar-card" style="border-top-color:var(--border);background:var(--white);">
+                <div class="sidebar-card__title" style="color:var(--muted);font-size:13px;letter-spacing:0.10em;">Ваш наставник</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-dim);border:2px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--accent);flex-shrink:0;">
+                        {{ route.mentor.first_name|first|upper }}{{ route.mentor.last_name|first|upper }}
+                    </div>
+                    <div>
+                        <div style="font-weight:700;font-size:16px;color:var(--ink);">{{ route.mentor.get_full_name|default:route.mentor.username }}</div>
+                        {% if route.mentor.department %}
+                        <div style="font-size:13px;color:var(--muted);">{{ route.mentor.department }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
-        {% endif %}
     </div>
+
 </div>
 {% endblock %}
 
@@ -157,49 +162,53 @@
 <script>
 const csrfToken = '{{ csrf_token }}';
 
-document.querySelectorAll('.task-checkbox').forEach(function(cb) {
-    cb.addEventListener('change', function() {
-        if (!this.checked) return;
-        const taskId = this.dataset.taskId;
-        this.disabled = true;
+function completeTask(el) {
+    const taskId = el.dataset.taskId;
+    if (!taskId) return;
 
-        fetch(`/adaptation/complete/${taskId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success || data.already_done) {
-                const item = document.getElementById(`task-item-${taskId}`);
-                if (item) {
-                    item.classList.add('task-done');
-                    // Добавляем иконку галочки
-                    const flex = item.querySelector('.d-flex');
-                    if (flex && !flex.querySelector('.bi-check-circle-fill')) {
-                        const icon = document.createElement('i');
-                        icon.className = 'bi bi-check-circle-fill text-success mt-1';
-                        flex.appendChild(icon);
-                    }
-                }
-                // Обновляем счётчики баллов и уровня
-                if (data.points !== undefined) {
-                    document.getElementById('user-points').textContent = data.points;
-                }
-                if (data.level !== undefined) {
-                    document.getElementById('user-level').textContent = data.level;
-                }
-                // Небольшая задержка и перезагрузка для обновления прогресс-баров
-                setTimeout(() => location.reload(), 800);
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0.6';
+
+    fetch(`/adaptation/complete/${taskId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success || data.already_done) {
+            const item = document.getElementById(`task-item-${taskId}`);
+            if (item) {
+                item.classList.remove('task-item--pending');
+                item.classList.add('task-item--done');
             }
-        })
-        .catch(() => {
-            this.disabled = false;
-            this.checked = false;
-        });
+            const check = document.getElementById(`task-check-${taskId}`);
+            if (check) {
+                check.classList.remove('task-item__check--empty');
+                check.textContent = '✓';
+            }
+            const title = document.getElementById(`task-title-${taskId}`);
+            if (title) {
+                title.classList.add('task-item__title--done');
+                title.style.cursor = 'default';
+                title.style.opacity = '1';
+                title.style.pointerEvents = 'none';
+            }
+            if (data.points !== undefined) {
+                document.getElementById('user-points').textContent = data.points;
+            }
+            if (data.level !== undefined) {
+                document.getElementById('user-level').textContent = data.level;
+            }
+            setTimeout(() => location.reload(), 900);
+        }
+    })
+    .catch(() => {
+        el.style.pointerEvents = '';
+        el.style.opacity = '';
     });
-});
+}
 </script>
 {% endblock %}

@@ -115,6 +115,11 @@ input, textarea, select { font-family: var(--font); }
   text-decoration: none;
   flex-shrink: 0;
 }
+.t-nav__logo img {
+  height: 38px;
+  width: auto;
+  display: block;
+}
 .t-nav__logo:hover { text-decoration: none; }
 .t-nav__logo-name {
   font-weight: 900;

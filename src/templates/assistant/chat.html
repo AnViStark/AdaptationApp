@@ -1,31 +1,34 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+/* Chat bubbles */
+.chat-msg{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.chat-msg__avatar{flex-shrink:0}
+.chat-msg__bubble{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--ink);max-width:70%;box-sizing:border-box}
+.chat-msg__bubble--user{background:var(--accent);color:#fff;border:none}
+.chat-msg--user{flex-direction:row-reverse}
+.chat-msg--user .chat-msg__bubble{text-align:right}
+@media (max-width:900px){.page-wrap{padding-right:0;max-width:100vw}.wade-full-figure{display:none}}
+</style>
+{% endblock %}
 
 {% block title %}Помощник Вэйд — Targem Games{% endblock %}
 {% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="page-wrap">
+<div class="page-wrap" style="position:relative;z-index:2;padding-right:320px;max-width:calc(100vw - 320px);box-sizing:border-box;">
 
     {# Wade header card #}
-    <div class="hero" style="min-height:160px;margin-bottom:20px;">
+    <div class="hero" style="min-height:160px;margin-bottom:20px;position:relative;z-index:1;">
         <div class="hero__content" style="padding:28px 36px;">
             <div>
                 <div class="card__eyebrow">AI-ассистент</div>
-                <h1 style="font-weight:900;font-size:36px;text-transform:uppercase;letter-spacing:-0.01em;line-height:1;color:var(--ink);margin-bottom:8px;">W.A.D.E.</h1>
+                <h1 style="font-weight:900;font-size:36px;text-transform:uppercase;letter-spacing:-0.01em;line-height:1;color:var(--ink);margin-bottom:8px;">Вэйд</h1>
                 <p class="hero__subtitle" style="font-size:15px;">Корпоративный помощник Targem Games. Задавай вопросы — отвечаю по базе знаний.</p>
             </div>
-        </div>
-        <div class="hero__illustration" style="position:relative;">
-            <svg width="100" height="100" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="rgba(77,216,232,0.15)" stroke="#4DD8E8" stroke-width="2"/>
-                <rect x="30" y="35" width="40" height="30" rx="8" fill="rgba(77,216,232,0.3)" stroke="#4DD8E8" stroke-width="1.5"/>
-                <circle cx="40" cy="50" r="5" fill="#4DD8E8" opacity="0.8"/>
-                <circle cx="60" cy="50" r="5" fill="#4DD8E8" opacity="0.8"/>
-                <path d="M40 62 Q50 68 60 62" stroke="#4DD8E8" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <rect x="44" y="22" width="12" height="14" rx="3" fill="rgba(77,216,232,0.4)" stroke="#4DD8E8" stroke-width="1.5"/>
-                <circle cx="50" cy="20" r="4" fill="rgba(77,216,232,0.5)"/>
-            </svg>
-            <form method="post" action="{% url 'assistant:clear' %}" style="position:absolute;top:12px;right:12px;">
+            <form method="post" action="{% url 'assistant:clear' %}" style="position:absolute;top:12px;right:12px;z-index:2;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn--outline btn--sm"
                         onclick="return confirm('Очистить историю чата?')">
@@ -33,6 +36,11 @@
                 </button>
             </form>
         </div>
+        <!-- Персонаж во весь рост справа -->
+        <img src="{% static 'img/wade-hero.png' %}"
+             alt="Вэйд"
+             class="wade-full-figure"
+             style="position:fixed;right:0;bottom:0;z-index:0;height:calc(100vh - 70px);max-height:900px;width:auto;pointer-events:none;user-select:none;display:block;filter:drop-shadow(0 8px 32px rgba(77,216,232,0.10));">
     </div>
 
     {# Chat area #}
@@ -41,7 +49,9 @@
              style="min-height:380px;max-height:500px;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:0;background:var(--subtle);">
             {% if not history %}
                 <div class="chat-msg">
-                    <div class="chat-msg__avatar">🤖</div>
+                    <div class="chat-msg__avatar" style="width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;">
+                        <img src="{% static 'img/wade-avatar.png' %}" alt="Вэйд" style="width:100%;height:100%;object-fit:cover;">
+                    </div>
                     <div>
                         <div class="chat-msg__bubble">Привет! Я — Вэйд, твой персональный гид по Targem Games.
 Спрашивай всё что хочешь — про офис, правила, процессы, технологии. Отвечаю по базе знаний компании. Ну и немного с юмором, уж извините — такая прошивка.</div>
@@ -56,7 +66,9 @@
                         </div>
                     {% else %}
                         <div class="chat-msg">
-                            <div class="chat-msg__avatar">🤖</div>
+                            <div class="chat-msg__avatar" style="width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;">
+                                <img src="{% static 'img/wade-avatar.png' %}" alt="Вэйд" style="width:100%;height:100%;object-fit:cover;">
+                            </div>
                             <div>
                                 <div class="chat-msg__bubble">{{ msg.text }}</div>
                                 {% if msg.sources %}
@@ -135,7 +147,22 @@ function appendMessage(role, text, sources) {
 
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'chat-msg__avatar' + (isUser ? ' chat-msg__avatar--user' : '');
-    avatarDiv.textContent = isUser ? '👤' : '🤖';
+    if (isUser) {
+        avatarDiv.textContent = '👤';
+    } else {
+        avatarDiv.style.width = '48px';
+        avatarDiv.style.height = '48px';
+        avatarDiv.style.borderRadius = '50%';
+        avatarDiv.style.overflow = 'hidden';
+        avatarDiv.style.flexShrink = '0';
+        const img = document.createElement('img');
+        img.src = '{% static "img/wade-avatar.png" %}';
+        img.alt = 'Вэйд';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        avatarDiv.appendChild(img);
+    }
 
     const bubble = document.createElement('div');
     bubble.className = 'chat-msg__bubble' + (isUser ? ' chat-msg__bubble--user' : '');
@@ -171,7 +198,18 @@ function showTyping() {
     msgDiv.id = 'typingIndicator';
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'chat-msg__avatar';
-    avatarDiv.textContent = '🤖';
+    avatarDiv.style.width = '48px';
+    avatarDiv.style.height = '48px';
+    avatarDiv.style.borderRadius = '50%';
+    avatarDiv.style.overflow = 'hidden';
+    avatarDiv.style.flexShrink = '0';
+    const img = document.createElement('img');
+    img.src = '{% static "img/wade-avatar.png" %}';
+    img.alt = 'Вэйд';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    avatarDiv.appendChild(img);
     const bubble = document.createElement('div');
     bubble.className = 'chat-msg__bubble';
     bubble.style.padding = '16px 20px';

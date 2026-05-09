@@ -22,25 +22,24 @@
                 <a href="{% url 'trainer:detail' pk=task.pk %}"
                    class="card card--clickable {% if sub and sub.status == 'accepted' %}card--accent{% endif %}"
                    style="text-decoration:none;color:inherit;">
-                    <div class="flex-between mb-16">
-                        <h3 style="font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;color:var(--ink);padding-right:12px;">
+                    <div class="flex-between mb-16" style="gap:12px;align-items:flex-start;">
+                        <h3 class="stage-card-title text-truncate-2" style="font-size:20px;flex:1;min-width:0;">
                             {{ task.title }}
                         </h3>
                         {% if sub %}
                             {% if sub.status == 'accepted' %}
-                                <span class="badge badge--accepted" style="flex-shrink:0;">✓ Принято</span>
+                                <span class="status-chip status-chip--accepted">✓ Принято</span>
                             {% elif sub.status == 'pending' %}
-                                <span class="badge" style="background:rgba(239,159,39,0.15);color:#c07d00;flex-shrink:0;">⏳ На проверке</span>
+                                <span class="status-chip status-chip--pending">⏳ На проверке</span>
                             {% elif sub.status == 'revision' %}
-                                <span class="badge" style="background:rgba(226,75,74,0.12);color:#c0392b;flex-shrink:0;">↩ Доработка</span>
+                                <span class="status-chip status-chip--revision">↩ Доработка</span>
                             {% endif %}
                         {% else %}
                             <span class="badge badge--muted" style="flex-shrink:0;">Не начато</span>
                         {% endif %}
                     </div>
 
-                    <p style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:20px;
-                               display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+                    <p class="text-truncate-3" style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:20px;">
                         {{ task.scenario_description }}
                     </p>
 
@@ -63,9 +62,9 @@
             {% endfor %}
         </div>
     {% else %}
-        <div style="text-align:center;padding:80px 24px;color:var(--muted);">
-            <div style="font-size:56px;margin-bottom:20px;">🐛</div>
-            <p style="font-size:17px;">Заданий тренажёра пока нет.</p>
+        <div class="empty-state empty-state--lg">
+            <div class="empty-state__icon">🐛</div>
+            <p class="empty-state__text">Заданий тренажёра пока нет.</p>
         </div>
     {% endif %}
 

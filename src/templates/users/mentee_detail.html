@@ -88,9 +88,9 @@
     <div class="col-lg-5">
         <!-- Pending -->
         <h5 class="fw-500 mb-3">
-            <i class="bi bi-hourglass-split me-2" style="color:#EF9F27;"></i>На проверке
+            <i class="bi bi-hourglass-split me-2" style="color:var(--targem-warning);"></i>На проверке
             {% if pending_submissions %}
-                <span class="badge ms-1" style="background:#EF9F27;">{{ pending_submissions|length }}</span>
+                <span class="badge ms-1" style="background:var(--targem-warning);">{{ pending_submissions|length }}</span>
             {% endif %}
         </h5>
 
@@ -102,7 +102,7 @@
                             <div class="card-body px-4 py-3">
                                 <div class="fw-500 text-dark small mb-1">{{ sub.task.title }}</div>
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted" style="font-size:0.78rem;">
+                                    <span class="text-muted" style="font-size:0.875rem;">
                                         {{ sub.submitted_at|date:"d.m.Y H:i" }}
                                     </span>
                                     <span class="text-primary small fw-500">
@@ -133,12 +133,12 @@
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <div class="fw-500 text-dark small">{{ sub.task.title }}</div>
                                     {% if sub.status == 'accepted' %}
-                                        <span class="badge" style="background:#27AE60; font-size:0.7rem;">Принято</span>
+                                        <span class="badge" style="background:var(--targem-success); font-size:0.7rem;">Принято</span>
                                     {% else %}
-                                        <span class="badge" style="background:#E24B4A; font-size:0.7rem;">Доработка</span>
+                                        <span class="badge" style="background:var(--targem-error); font-size:0.7rem;">Доработка</span>
                                     {% endif %}
                                 </div>
-                                <span class="text-muted" style="font-size:0.78rem;">
+                                <span class="text-muted" style="font-size:0.875rem;">
                                     {{ sub.submitted_at|date:"d.m.Y" }}
                                 </span>
                             </div>

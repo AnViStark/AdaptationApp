@@ -12,7 +12,7 @@
             <div class="page-header__eyebrow">Онбординг · {{ route.template.name }}</div>
             <h1 class="page-header__title">Мой маршрут</h1>
         </div>
-        <div style="display:flex;gap:12px;">
+        <div class="page-header__actions">
             <div class="stat-pill">
                 <span class="stat-pill__value" id="user-points">{{ user.points }}</span>
                 <span class="stat-pill__label">Баллов</span>
@@ -27,8 +27,8 @@
     {# Overall progress bar #}
     <div class="card card--accent mb-24">
         <div class="flex-between mb-8">
-            <span style="font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink);">Общий прогресс</span>
-            <span style="font-weight:700;font-size:14px;color:var(--accent);" id="overall-progress-text">{{ completed_tasks }} из {{ total_tasks }} заданий</span>
+            <span class="section-title" style="margin-bottom:0;">Общий прогресс</span>
+            <span class="stage-card-counter" id="overall-progress-text">{{ completed_tasks }} из {{ total_tasks }} заданий</span>
         </div>
         <div class="xp-bar xp-bar--lg">
             <div class="xp-bar__fill" id="overall-progress-bar" style="width: {{ progress_percent }}%;"></div>
@@ -44,16 +44,16 @@
             <div class="card">
                 <div class="flex-between mb-16">
                     <div>
-                        <div style="font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--accent);margin-bottom:4px;">Текущий этап</div>
-                        <h2 style="font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);">{{ current_stage.stage.title }}</h2>
+                        <div class="stage-card-eyebrow">Текущий этап</div>
+                        <h2 class="stage-card-title">{{ current_stage.stage.title }}</h2>
                     </div>
-                    <span style="font-weight:700;font-size:14px;color:var(--accent);">{{ current_stage.done }}/{{ current_stage.total }}</span>
+                    <span class="stage-card-counter">{{ current_stage.done }}/{{ current_stage.total }}</span>
                 </div>
                 <div class="xp-bar mb-24">
                     <div class="xp-bar__fill" style="width: {{ current_stage.percent }}%;"></div>
                 </div>
 
-                <div style="display:flex;flex-direction:column;gap:8px;" id="task-list">
+                <div class="task-list" id="task-list">
                     {% for item in current_stage.tasks %}
                     <div class="task-item {% if item.completed %}task-item--done{% else %}task-item--pending{% endif %}"
                          id="task-item-{{ item.task.id }}">
@@ -61,7 +61,7 @@
                              id="task-check-{{ item.task.id }}">
                             {% if item.completed %}✓{% endif %}
                         </div>
-                        <div style="flex:1;">
+                        <div class="task-item__body">
                             <div class="task-item__title {% if item.completed %}task-item__title--done{% endif %}"
                                  style="cursor:{% if not item.completed %}pointer{% else %}default{% endif %};"
                                  id="task-title-{{ item.task.id }}"
@@ -69,10 +69,10 @@
                                 {{ item.task.title }}
                             </div>
                             {% if item.task.description %}
-                                <p style="font-size:14px;color:var(--muted);margin-top:4px;line-height:1.4;">{{ item.task.description }}</p>
+                                <p class="task-item__desc">{{ item.task.description }}</p>
                             {% endif %}
                             {% if item.task.article or item.task.trainer_task %}
-                            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                            <div class="task-item__links">
                                 {% if item.task.article %}
                                     <a href="{% url 'knowledge:article' slug=item.task.article.slug %}" class="t-article-link">
                                         📖 {{ item.task.article.title }}
@@ -96,10 +96,10 @@
                 </div>
             </div>
             {% else %}
-            <div class="card" style="text-align:center;padding:60px 24px;">
-                <div style="font-size:48px;margin-bottom:16px;">🏆</div>
-                <h3 style="font-weight:800;font-size:24px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Маршрут завершён!</h3>
-                <p style="color:var(--muted);font-size:16px;">Вы выполнили все задания. Отличная работа!</p>
+            <div class="card empty-state">
+                <div class="empty-state__icon">🏆</div>
+                <h3 class="stage-card-title" style="margin-bottom:8px;">Маршрут завершён!</h3>
+                <p class="empty-state__text">Вы выполнили все задания. Отличная работа!</p>
             </div>
             {% endif %}
         </div>
@@ -113,11 +113,11 @@
                 <div class="stage-list">
                     {% for s in stages_data %}
                     <div class="stage-list__item">
-                        <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
                             <div class="stage-list__check {% if s.status != 'done' and s != current_stage %}stage-list__check--empty{% endif %}">
                                 {% if s.status == 'done' %}✓{% elif s == current_stage %}→{% endif %}
                             </div>
-                            <div>
+                            <div style="min-width:0;flex:1;">
                                 <div class="stage-list__name">{{ s.stage.title }}</div>
                                 <div class="stage-list__sub">{{ s.done }}/{{ s.total }} заданий</div>
                             </div>
@@ -136,16 +136,16 @@
 
             {# Mentor block #}
             {% if route.mentor %}
-            <div class="sidebar-card" style="border-top-color:var(--border);background:var(--white);">
-                <div class="sidebar-card__title" style="color:var(--muted);font-size:13px;letter-spacing:0.10em;">Ваш наставник</div>
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-dim);border:2px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--accent);flex-shrink:0;">
+            <div class="sidebar-card sidebar-card--neutral">
+                <div class="sidebar-card__title" style="color:var(--muted);letter-spacing:0.10em;">Ваш наставник</div>
+                <div class="mentor-block">
+                    <div class="mentor-block__avatar">
                         {{ route.mentor.first_name|first|upper }}{{ route.mentor.last_name|first|upper }}
                     </div>
-                    <div>
-                        <div style="font-weight:700;font-size:16px;color:var(--ink);">{{ route.mentor.get_full_name|default:route.mentor.username }}</div>
+                    <div style="min-width:0;">
+                        <div class="mentor-block__name">{{ route.mentor.get_full_name|default:route.mentor.username }}</div>
                         {% if route.mentor.department %}
-                        <div style="font-size:13px;color:var(--muted);">{{ route.mentor.department }}</div>
+                        <div class="mentor-block__sub">{{ route.mentor.department }}</div>
                         {% endif %}
                     </div>
                 </div>

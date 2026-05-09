@@ -38,10 +38,8 @@
 
     {% if query %}
         {# ── Search header ── #}
-        <div style="margin-bottom:24px;display:flex;align-items:baseline;gap:12px;">
-            <span style="font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink);">
-                Результаты: «{{ query }}»
-            </span>
+        <div class="search-results-header">
+            <span class="search-results-title">Результаты: «{{ query }}»</span>
             {% if text_articles or semantic_articles %}
                 <span class="badge badge--muted">
                     {{ text_articles|length|add:semantic_articles|length }} найдено
@@ -50,32 +48,30 @@
         </div>
 
         {% if not text_articles and not semantic_articles %}
-            <div style="text-align:center;padding:60px 0;color:var(--muted);">
-                <div style="font-size:48px;margin-bottom:16px;">🔍</div>
-                <p style="font-size:16px;">Ничего не найдено — попробуй другой запрос.</p>
+            <div class="empty-state">
+                <div class="empty-state__icon">🔍</div>
+                <p class="empty-state__text">Ничего не найдено — попробуй другой запрос.</p>
             </div>
         {% endif %}
 
         {# ── Keyword results ── #}
         {% if text_articles %}
-        <div style="margin-bottom:32px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                <span style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--muted);">
-                    По ключевым словам
-                </span>
+        <div class="search-results-section">
+            <div class="search-results-section__head">
+                <span class="search-results-section__label">По ключевым словам</span>
                 <span class="badge badge--muted badge--sm">{{ text_articles|length }}</span>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="search-results-list">
                 {% for article in text_articles %}
-                <a href="{% url 'knowledge:article' slug=article.slug %}" class="card card--clickable" style="padding:16px 20px;">
-                    <div style="display:flex;align-items:center;gap:14px;">
-                        <div style="width:36px;height:36px;background:var(--accent-dim);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📄</div>
-                        <div style="flex:1;min-width:0;">
+                <a href="{% url 'knowledge:article' slug=article.slug %}" class="card card--clickable search-result">
+                    <div class="search-result__inner">
+                        <div class="search-result__icon">📄</div>
+                        <div class="search-result__body">
                             <span class="badge badge--muted badge--sm" style="margin-bottom:4px;">{{ article.category.name }}</span>
-                            <div style="font-weight:700;font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ article.title }}</div>
-                            <div style="font-size:13px;color:var(--muted);margin-top:2px;">{{ article.updated_at|date:"d.m.Y" }}</div>
+                            <div class="search-result__title text-truncate-2">{{ article.title }}</div>
+                            <div class="search-result__meta">{{ article.updated_at|date:"d.m.Y" }}</div>
                         </div>
-                        <span style="color:var(--muted);font-size:18px;flex-shrink:0;">›</span>
+                        <span class="search-result__chevron">›</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -86,38 +82,34 @@
         {# ── Semantic results ── #}
         {% if semantic_articles %}
         <div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                <span style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.10em;color:var(--muted);">
-                    Похожие по смыслу
-                </span>
+            <div class="search-results-section__head">
+                <span class="search-results-section__label">Похожие по смыслу</span>
                 <span class="badge badge--accepted badge--sm">AI</span>
                 <span class="badge badge--muted badge--sm">{{ semantic_articles|length }}</span>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="search-results-list">
                 {% for item in semantic_articles %}
                 <a href="{% url 'knowledge:article' slug=item.article.slug %}"
-                   class="card card--clickable"
-                   style="padding:16px 20px;border-left:3px solid var(--accent);">
-                    <div style="display:flex;align-items:flex-start;gap:14px;">
-                        <div style="width:36px;height:36px;background:var(--accent-dim);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:2px;">✨</div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+                   class="card card--clickable search-result search-result--semantic">
+                    <div class="search-result__inner search-result__inner--top">
+                        <div class="search-result__icon">✨</div>
+                        <div class="search-result__body">
+                            <div class="search-result__chips">
                                 <span class="badge badge--accepted badge--sm">{{ item.article.category.name }}</span>
-                                {# Similarity pill: green ≥80, cyan ≥65, muted below #}
                                 {% if item.similarity >= 80 %}
-                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:rgba(46,204,113,0.12);color:#1a7a42;border:1px solid rgba(46,204,113,0.3);">{{ item.similarity }}% схожесть</span>
+                                    <span class="similarity-pill similarity-pill--high">{{ item.similarity }}% схожесть</span>
                                 {% elif item.similarity >= 65 %}
-                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border);">{{ item.similarity }}% схожесть</span>
+                                    <span class="similarity-pill similarity-pill--mid">{{ item.similarity }}% схожесть</span>
                                 {% else %}
-                                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:6px;background:var(--subtle);color:var(--muted);border:1px solid var(--border);">{{ item.similarity }}% схожесть</span>
+                                    <span class="similarity-pill similarity-pill--low">{{ item.similarity }}% схожесть</span>
                                 {% endif %}
                             </div>
-                            <div style="font-weight:700;font-size:16px;color:var(--ink);margin-bottom:6px;">{{ item.article.title }}</div>
+                            <div class="search-result__title text-truncate-2">{{ item.article.title }}</div>
                             {% if item.snippet %}
-                            <div style="font-size:14px;color:var(--muted);line-height:1.5;">{{ item.snippet }}</div>
+                            <div class="search-result__snippet text-truncate-3">{{ item.snippet }}</div>
                             {% endif %}
                         </div>
-                        <span style="color:var(--muted);font-size:18px;flex-shrink:0;margin-top:2px;">›</span>
+                        <span class="search-result__chevron">›</span>
                     </div>
                 </a>
                 {% endfor %}
@@ -131,16 +123,13 @@
             <div class="card-grid-4">
                 {% for category in categories %}
                 <a href="{% url 'knowledge:category' slug=category.slug %}" class="card card--clickable" style="padding:0;overflow:hidden;">
-                    <div class="card__image-area" style="height:70px;">
-                        <svg width="40" height="40" viewBox="0 0 40 40">
-                            <rect width="40" height="40" rx="10" fill="rgba(77,216,232,0.15)"/>
-                            <path d="M8 28 L8 16 Q8 12 12 12 L18 12 L20 15 L32 15 Q36 15 36 19 L36 28 Q36 32 32 32 L12 32 Q8 32 8 28 Z" fill="#4DD8E8" opacity="0.7"/>
-                            <rect x="14" y="20" width="12" height="2" rx="1" fill="white" opacity="0.8"/>
-                            <rect x="14" y="25" width="8" height="2" rx="1" fill="white" opacity="0.6"/>
-                        </svg>
+                    <div class="card-illustration card-illustration--knowledge" style="height:90px;">
+                        <span class="card-illustration__icon" style="width:56px;height:56px;font-size:28px;">
+                            <i class="bi bi-folder-fill"></i>
+                        </span>
                     </div>
                     <div class="card__body">
-                        <div class="card__title" style="margin-bottom:4px;">{{ category.name }}</div>
+                        <div class="card__title text-truncate-2" style="margin-bottom:4px;">{{ category.name }}</div>
                         <p class="card__desc" style="margin-bottom:10px;">
                             {{ category.articles.count }}
                             {% with count=category.articles.count %}
@@ -153,9 +142,9 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div style="text-align:center;padding:60px 0;color:var(--muted);">
-                <div style="font-size:48px;margin-bottom:16px;">📚</div>
-                <p style="font-size:16px;">База знаний пока пуста.</p>
+            <div class="empty-state">
+                <div class="empty-state__icon">📚</div>
+                <p class="empty-state__text">База знаний пока пуста.</p>
                 {% if user.role == 'admin' or user.role == 'hr' %}
                     <a href="{% url 'knowledge:create' %}" class="btn btn--primary" style="margin-top:12px;">Создать первую статью</a>
                 {% endif %}

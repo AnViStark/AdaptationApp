@@ -37,14 +37,14 @@
                 <tr class="align-middle">
                     <td class="px-4 py-3">
                         <div class="fw-500 small">{{ route.user.get_full_name|default:route.user.username }}</div>
-                        <div class="text-muted" style="font-size:0.75rem;">{{ route.user.email }}</div>
+                        <div class="text-muted" style="font-size:0.875rem;">{{ route.user.email }}</div>
                     </td>
                     <td class="small">{{ route.template.name }}</td>
                     <td class="small text-muted">{{ route.mentor|default:"—" }}</td>
                     <td class="small text-muted">{{ route.started_at|date:"d.m.Y" }}</td>
                     <td>
                         {% if route.is_active %}
-                            <span class="badge" style="background:#27AE60;">Активен</span>
+                            <span class="badge" style="background:var(--targem-success);">Активен</span>
                         {% else %}
                             <span class="badge bg-secondary">Деактивирован</span>
                         {% endif %}

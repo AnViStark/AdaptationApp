@@ -18,7 +18,7 @@ class ArticleForm(forms.ModelForm):
         required=False,
         label='Новая категория (если нет нужной)',
         max_length=200,
-        widget=forms.TextInput(attrs={'placeholder': 'Введите название новой категории'}),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название новой категории'}),
     )
 
     class Meta:

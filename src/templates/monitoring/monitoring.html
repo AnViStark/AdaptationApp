@@ -39,7 +39,7 @@
 {% if rows %}
 <div class="card shadow-sm">
     <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover table-cards mb-0">
             <thead class="table-light">
                 <tr>
                     <th class="px-4 py-3">Сотрудник</th>
@@ -56,24 +56,24 @@
                     onclick="location.href='{% url 'monitoring:employee_detail' user_id=row.user.pk %}'">
                     <td class="px-4 py-3">
                         <div class="d-flex align-items-center gap-2">
-                            <div class="mentee-avatar" style="width:34px;height:34px;font-size:0.75rem;">
+                            <div class="mentee-avatar" style="width:36px;height:36px;font-size:0.875rem;">
                                 {{ row.user.first_name|first|upper }}{{ row.user.last_name|first|upper }}
                             </div>
                             <div>
                                 <div class="fw-500 small">{{ row.user.get_full_name|default:row.user.username }}</div>
-                                <div class="text-muted" style="font-size:0.75rem;">{{ row.user.email }}</div>
+                                <div class="text-muted" style="font-size:0.875rem;">{{ row.user.email }}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="text-muted small">{{ row.user.department|default:"—" }}</td>
-                    <td class="small">
+                    <td class="text-muted small" data-label="Отдел">{{ row.user.department|default:"—" }}</td>
+                    <td class="small" data-label="Наставник">
                         {% if row.mentor %}
                             {{ row.mentor.get_full_name|default:row.mentor.username }}
                         {% else %}
                             <span class="text-muted">—</span>
                         {% endif %}
                     </td>
-                    <td style="min-width: 140px;">
+                    <td style="min-width: 140px;" data-label="Прогресс">
                         {% if row.route %}
                             <div class="d-flex align-items-center gap-2">
                                 <div class="progress flex-grow-1" style="height:6px;">
@@ -82,13 +82,13 @@
                                 <span class="small fw-500 text-primary" style="min-width:32px;">{{ row.progress }}%</span>
                             </div>
                         {% else %}
-                            <span class="badge bg-secondary" style="font-size:0.72rem;">Нет маршрута</span>
+                            <span class="badge bg-secondary" style="font-size:0.8rem;">Нет маршрута</span>
                         {% endif %}
                     </td>
-                    <td class="small text-muted">
+                    <td class="small text-muted" data-label="Дней">
                         {% if row.days_in_system != None %}{{ row.days_in_system }}д{% else %}—{% endif %}
                     </td>
-                    <td class="small text-muted">
+                    <td class="small text-muted" data-label="Посл. активность">
                         {% if row.last_activity %}{{ row.last_activity|date:"d.m.Y" }}{% else %}—{% endif %}
                     </td>
                 </tr>

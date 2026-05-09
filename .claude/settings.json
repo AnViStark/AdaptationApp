@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"c:\\\\Users\\\\andre\\\\Downloads\\\\Преддипломная\\\\AdaptationApp\"; Get-ChildItem -Recurse -Depth 2 | Where-Object {$_.PSIsContainer} | Select-Object FullName)",
+      "PowerShell(ls \"c:\\\\Users\\\\andre\\\\Downloads\\\\Преддипломная\\\\AdaptationApp\" | Where-Object {$_.PSIsContainer -eq $false} | Select-Object Name)",
+      "Bash(grep -E '\\\\.\\(md|txt|yml|yaml|json\\)$|Dockerfile|docker-compose')",
+      "Bash(node -e \"const fs=require\\('fs'\\);const c=fs.readFileSync\\('c:/Users/andre/Downloads/Преддипломная/AdaptationApp/src/static/css/targem-tokens.css','utf8'\\);const open=\\(c.match\\(/{/g\\)||[]\\).length;const close=\\(c.match\\(/}/g\\)||[]\\).length;console.log\\('open braces:',open,'close braces:',close,'diff:',open-close\\);console.log\\('total length:',c.length,'lines:',c.split\\('\\\\n'\\).length\\)\")",
+      "Bash(python -c \"from PIL import Image; im=Image.open\\(r'c:/Users/andre/Downloads/Преддипломная/AdaptationApp/src/static/img/wade-avatar.png'\\); print\\('avatar:', im.size, im.mode\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);for \\(const p of ['src/static/css/targem-tokens.css','src/static/css/custom.css']\\) {const c=fs.readFileSync\\('c:/Users/andre/Downloads/Преддипломная/AdaptationApp/'+p,'utf8'\\);const o=\\(c.match\\(/{/g\\)||[]\\).length;const cl=\\(c.match\\(/}/g\\)||[]\\).length;console.log\\(p, '— braces open:',o,'close:',cl,'diff:',o-cl,'lines:',c.split\\('\\\\n'\\).length\\)}\")"
+    ]
+  }
+}

@@ -38,7 +38,7 @@
                     <td class="small text-muted">{{ sub.submitted_at|date:"d.m.Y H:i" }}</td>
                     <td>
                         {% if sub.status == 'accepted' %}
-                            <span class="badge" style="background:#27AE60;">Принята</span>
+                            <span class="badge" style="background:var(--targem-success);">Принята</span>
                         {% elif sub.status == 'revision' %}
                             <span class="badge bg-warning text-dark">На доработке</span>
                         {% else %}
